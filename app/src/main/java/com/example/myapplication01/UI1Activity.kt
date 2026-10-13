@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -41,9 +40,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import java.util.Locale
 
-class UI1Activity : AppCompatActivity(), TextToSpeech.OnInitListener {
+class UI1Activity : AppCompatActivity() {
 
-    private lateinit var tts: TextToSpeech
+    private lateinit var ttsManager: TtsManager
     private var currentLanguageCode = "zh-TW"
     
     // 記錄當前選定的信仰卡片，預設為 null (未選擇)
@@ -93,7 +92,7 @@ class UI1Activity : AppCompatActivity(), TextToSpeech.OnInitListener {
         
         // 刪除多餘的 checkConsent()，由 TermsPrivacyActivity 統一處理
 
-        tts = TextToSpeech(this, this)
+        ttsManager = TtsManager(this)
 
         setupListeners()
         setupLanguageSpinner()
@@ -333,7 +332,7 @@ class UI1Activity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun updateTTSLanguage(langCode: String) {
-        if (!::tts.isInitialized) return
+        if (!::ttsManager.isInitialized) return
         val locale = when (langCode) {
             "zh-TW" -> Locale.TRADITIONAL_CHINESE
             "en" -> Locale.US
@@ -342,25 +341,18 @@ class UI1Activity : AppCompatActivity(), TextToSpeech.OnInitListener {
             "vi" -> Locale("vi", "VN")
             else -> Locale.TRADITIONAL_CHINESE
         }
-        tts.language = locale
+        ttsManager.setLanguage(locale)
     }
 
     private fun playTTS(text: String) {
-        if (::tts.isInitialized) {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "UI1_TTS")
-        }
-    }
-
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            updateTTSLanguage(currentLanguageCode)
+        if (::ttsManager.isInitialized) {
+            ttsManager.speak(text, utteranceId = "UI1_TTS")
         }
     }
 
     override fun onDestroy() {
-        if (::tts.isInitialized) {
-            tts.stop()
-            tts.shutdown()
+        if (::ttsManager.isInitialized) {
+            ttsManager.shutdown()
         }
         super.onDestroy()
     }

@@ -1,7 +1,6 @@
 package com.example.myapplication01
 
 import android.content.Context
-import android.speech.tts.TextToSpeech
 import java.util.Locale
 
 /**
@@ -10,17 +9,11 @@ import java.util.Locale
  */
 object DeityBlessingTTS {
 
-    private var tts: TextToSpeech? = null
-    private var isInitialized = false
+    private var ttsManager: TtsManager? = null
 
     fun init(context: Context) {
-        if (tts == null) {
-            tts = TextToSpeech(context) { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    isInitialized = true
-                    updateLanguage()
-                }
-            }
+        if (ttsManager == null) {
+            ttsManager = TtsManager(context)
         }
     }
 
@@ -34,15 +27,13 @@ object DeityBlessingTTS {
             "vi" -> Locale("vi", "VN")
             else -> Locale.TRADITIONAL_CHINESE
         }
-        tts?.language = locale
+        ttsManager?.setLanguage(locale)
     }
 
     /**
      * 播放當前選定神明的祝福詞
      */
     fun speakCurrentBlessing(context: Context) {
-        if (!isInitialized) return
-        
         updateLanguage()
         
         // 1. 取得當前語系的所有卡片
@@ -60,22 +51,19 @@ object DeityBlessingTTS {
         }
         
         // 4. 執行異步非阻塞播報
-        tts?.speak(blessingText, TextToSpeech.QUEUE_FLUSH, null, "DEITY_BLESSING")
+        ttsManager?.speak(blessingText, utteranceId = "DEITY_BLESSING")
     }
 
     /**
      * 播放任意文字 (非阻塞)
      */
     fun speak(text: String) {
-        if (!isInitialized) return
         updateLanguage()
-        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "GENERIC_FEEDBACK")
+        ttsManager?.speak(text, utteranceId = "GENERIC_FEEDBACK")
     }
 
     fun shutdown() {
-        tts?.stop()
-        tts?.shutdown()
-        tts = null
-        isInitialized = false
+        ttsManager?.shutdown()
+        ttsManager = null
     }
 }
