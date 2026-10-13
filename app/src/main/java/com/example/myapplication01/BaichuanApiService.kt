@@ -40,19 +40,19 @@ object BaichuanApiService {
         .addInterceptor { chain ->
             val originalRequest = chain.request()
 
-            // 1. 自動帶入最新有效的 Authorization Header 與標準 Headers
+            // 1. 確保在所有發布與資料同步的 API 請求 Header 中，自動帶入正確且有效的 Token（Authorization）
             val authHeader = getAuthHeader()
             val requestBuilder = originalRequest.newBuilder()
                 .header(HEADER_ACCEPT, VALUE_ACCEPT)
                 .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
 
-            if (authHeader.isNotBlank() && originalRequest.header(HEADER_AUTH) == null) {
+            if (authHeader.isNotBlank()) {
                 requestBuilder.header(HEADER_AUTH, authHeader)
             }
 
             var response = chain.proceed(requestBuilder.build())
 
-            // 2. 攔截 401 Unauthorized 或 403 Forbidden 情況，自動執行刷新與重試
+            // 2. 攔截 401 Unauthorized 或 403 Forbidden 情況，嘗試自動刷新 Token 並重試
             if (response.code == 401 || response.code == 403) {
                 android.util.Log.e("BaichuanAPI", "⚠️ API 響應 HTTP ${response.code} (Unauthorized / Token 無效)，嘗試自動重新獲取...")
 
@@ -71,9 +71,9 @@ object BaichuanApiService {
                     }
                 }
 
-                // 若重試後依然為 401/403，觸發自動導向登入頁面與提示
+                // 若重試後依然為 401/403，安全提示錯誤，絕對不強制將使用者踢回條款同意頁面
                 if (response.code == 401 || response.code == 403) {
-                    handleUnauthorized()
+                    handleUnauthorizedError()
                 }
             }
 
@@ -105,26 +105,13 @@ object BaichuanApiService {
     }
 
     /**
-     * 當 Token 徹底失效 (401) 時，清除憑證並導向登入/驗證條款頁面
+     * 當發生 401 / 403 錯誤時的錯誤處理邏輯，僅提示錯誤而不強制跳轉或重置條款
      */
-    private fun handleUnauthorized() {
-        android.util.Log.e("BaichuanAPI", "⛔ 身份驗證失敗 (401 Unauthorized)，導向登入驗證頁面")
-        UserIdentityManager.clearAuthToken(appContext)
-
+    private fun handleUnauthorizedError() {
+        android.util.Log.e("BaichuanAPI", "⛔ 身份驗證失敗 (401 Unauthorized / 403 Forbidden)，請檢查 Token 設定")
         Handler(Looper.getMainLooper()).post {
             appContext?.let { ctx ->
-                Toast.makeText(ctx, "身份驗證已過期或無效 (401 Unauthorized)，請重新驗證", Toast.LENGTH_LONG).show()
-
-                // 重置 onboarding 同意紀錄，讓使用者能重新觸發條款登入驗證
-                ctx.getSharedPreferences("APP_ONBOARDING", Context.MODE_PRIVATE)
-                    .edit()
-                    .putBoolean("IS_FIRST_LAUNCH_AGREED", false)
-                    .apply()
-
-                val intent = Intent(ctx, TermsPrivacyActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                ctx.startActivity(intent)
+                Toast.makeText(ctx, "API 驗證失敗 (401 Unauthorized)，請檢查 Token 設定", Toast.LENGTH_LONG).show()
             }
         }
     }
