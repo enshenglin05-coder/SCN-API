@@ -1,5 +1,10 @@
 package com.example.myapplication01
 
+import android.content.Context
+import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import com.example.myapplication01.BuildConfig
 import com.google.gson.Gson
 import okhttp3.*
@@ -10,54 +15,130 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 百川 1.0 API 傳輸中心 (GitHub 極簡架構)
- * 負責 GitHub 數據同步、金鑰管理與資料對齊
+ * 負責 GitHub 數據同步、金鑰管理與資料對齊，並處理 401/403 驗證過期自動重新登入
  */
 object BaichuanApiService {
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .writeTimeout(20, TimeUnit.SECONDS)
-        .build()
+    private var appContext: Context? = null
 
-    private val gson = Gson()
-    
+    fun init(context: Context) {
+        appContext = context.applicationContext
+        UserIdentityManager.init(context)
+    }
+
     // GitHub API 標頭配置
     private const val HEADER_ACCEPT = "Accept"
     private const val VALUE_ACCEPT = "application/vnd.github+json"
     private const val HEADER_USER_AGENT = "User-Agent"
     private const val VALUE_USER_AGENT = "BaichuanApp"
     private const val HEADER_AUTH = "Authorization"
-    
+
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(20, TimeUnit.SECONDS)
+        .writeTimeout(20, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val originalRequest = chain.request()
+
+            // 1. 自動帶入最新有效的 Authorization Header 與標準 Headers
+            val authHeader = getAuthHeader()
+            val requestBuilder = originalRequest.newBuilder()
+                .header(HEADER_ACCEPT, VALUE_ACCEPT)
+                .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
+
+            if (authHeader.isNotBlank() && originalRequest.header(HEADER_AUTH) == null) {
+                requestBuilder.header(HEADER_AUTH, authHeader)
+            }
+
+            var response = chain.proceed(requestBuilder.build())
+
+            // 2. 攔截 401 Unauthorized 或 403 Forbidden 情況，自動執行刷新與重試
+            if (response.code == 401 || response.code == 403) {
+                android.util.Log.e("BaichuanAPI", "⚠️ API 響應 HTTP ${response.code} (Unauthorized / Token 無效)，嘗試自動重新獲取...")
+
+                // 嘗試刷新 Token
+                val refreshed = UserIdentityManager.refreshAuthToken(appContext)
+                if (refreshed) {
+                    val newAuthHeader = getAuthHeader()
+                    if (newAuthHeader.isNotBlank()) {
+                        response.close() // 關閉先前的 401 Response
+                        val retryRequest = originalRequest.newBuilder()
+                            .header(HEADER_AUTH, newAuthHeader)
+                            .header(HEADER_ACCEPT, VALUE_ACCEPT)
+                            .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
+                            .build()
+                        response = chain.proceed(retryRequest)
+                    }
+                }
+
+                // 若重試後依然為 401/403，觸發自動導向登入頁面與提示
+                if (response.code == 401 || response.code == 403) {
+                    handleUnauthorized()
+                }
+            }
+
+            response
+        }
+        .build()
+
+    private val gson = Gson()
+
     private val GITHUB_URL = BuildConfig.GITHUB_API_URL
     // GitHub Contents API: 用於寫入分片檔案
     private val GITHUB_CONTENTS_BASE_URL = GITHUB_URL.replace("/issues", "/contents/data/")
     private const val RAW_DATA_BASE_URL = "https://raw.githubusercontent.com/enshenglin05-coder/SCN-API/main/data/"
-    
-    private val AUTH_VALUE: String by lazy { 
-        val token = BuildConfig.GITHUB_TOKEN
+
+    /**
+     * 動態獲取 Authorization Header (自動為 Token 加上 Bearer 前綴)
+     */
+    fun getAuthHeader(): String {
+        val token = UserIdentityManager.getAuthToken(appContext)
         if (token.isBlank()) {
-            android.util.Log.w("BaichuanAPI", "⚠️ GITHUB_TOKEN 未設定或為空！請在 local.properties 中設定 GITHUB_TOKEN=your_token，否則 GitHub API 寫入會失敗 (401/403)")
+            android.util.Log.w("BaichuanAPI", "⚠️ Token 為空！請確認 local.properties 設定或進行登入")
+            return ""
         }
-        "Bearer $token" 
+        return if (token.startsWith("Bearer ", ignoreCase = true) || token.startsWith("token ", ignoreCase = true)) {
+            token
+        } else {
+            "Bearer $token"
+        }
+    }
+
+    /**
+     * 當 Token 徹底失效 (401) 時，清除憑證並導向登入/驗證條款頁面
+     */
+    private fun handleUnauthorized() {
+        android.util.Log.e("BaichuanAPI", "⛔ 身份驗證失敗 (401 Unauthorized)，導向登入驗證頁面")
+        UserIdentityManager.clearAuthToken(appContext)
+
+        Handler(Looper.getMainLooper()).post {
+            appContext?.let { ctx ->
+                Toast.makeText(ctx, "身份驗證已過期或無效 (401 Unauthorized)，請重新驗證", Toast.LENGTH_LONG).show()
+
+                // 重置 onboarding 同意紀錄，讓使用者能重新觸發條款登入驗證
+                ctx.getSharedPreferences("APP_ONBOARDING", Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("IS_FIRST_LAUNCH_AGREED", false)
+                    .apply()
+
+                val intent = Intent(ctx, TermsPrivacyActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                ctx.startActivity(intent)
+            }
+        }
     }
 
     /**
      * 發布卡片數據 (Targeted File Write)
-     * 邏輯：先嘗試獲取該類別的 JSON 檔案，若存在則追加，若不存在 (404) 則新建
      */
     fun publishCard(card: RequirementCard, onSuccess: () -> Unit, onError: (String) -> Unit) {
         val categoryCode = card.category_code
         val fileName = "$categoryCode.json"
         val contentsUrl = "$GITHUB_CONTENTS_BASE_URL$fileName"
 
-        // 1. 先獲取文件資訊 (需取得 SHA 才能更新檔案)
-        val auth = AUTH_VALUE
         val getRequest = Request.Builder()
             .url(contentsUrl)
-            .addHeader(HEADER_ACCEPT, VALUE_ACCEPT)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
-            .addHeader(HEADER_AUTH, auth)
             .get()
             .build()
 
@@ -76,7 +157,6 @@ object BaichuanApiService {
                 val cards = mutableListOf<RequirementCard>()
 
                 if (response.isSuccessful) {
-                    // 文件存在，解析內容與 SHA
                     try {
                         val fileInfo = gson.fromJson(bodyString, Map::class.java)
                         sha = fileInfo["sha"] as? String
@@ -89,19 +169,19 @@ object BaichuanApiService {
                         android.util.Log.e("BaichuanAPI", "解析現有檔案失敗: ${e.message}")
                     }
                 } else if (code == 404) {
-                    // 檔案尚不存在，正常建立新檔案
                     sha = null
+                } else if (code == 401 || code == 403) {
+                    onError("401 Unauthorized")
+                    return
                 } else {
                     android.util.Log.e("BaichuanAPI", "Publish/Get 錯誤 HTTP $code: $bodyString")
                     onError("HTTP $code: $bodyString")
                     return
                 }
 
-                // 2. 追加新卡片並去重 (同一發布者在同一類別僅保留一筆)
                 cards.removeAll { it.publisher_device_id == card.publisher_device_id && it.drawer_type == card.drawer_type }
                 cards.add(card)
 
-                // 3. 寫回 GitHub
                 writeToGitHub(contentsUrl, cards, sha, onSuccess, onError)
             }
         })
@@ -110,7 +190,7 @@ object BaichuanApiService {
     private fun writeToGitHub(url: String, cards: List<RequirementCard>, sha: String?, onSuccess: () -> Unit, onError: (String) -> Unit) {
         val json = gson.toJson(cards)
         val contentBase64 = android.util.Base64.encodeToString(json.toByteArray(), android.util.Base64.NO_WRAP)
-        
+
         val payload = mutableMapOf(
             "message" to "Update drawer data: ${System.currentTimeMillis()}",
             "content" to contentBase64
@@ -118,13 +198,9 @@ object BaichuanApiService {
         sha?.let { payload["sha"] = it }
 
         val body = gson.toJson(payload).toRequestBody("application/json".toMediaType())
-        val auth = AUTH_VALUE
 
         val request = Request.Builder()
             .url(url)
-            .addHeader(HEADER_ACCEPT, VALUE_ACCEPT)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
-            .addHeader(HEADER_AUTH, auth)
             .put(body)
             .build()
 
@@ -149,7 +225,6 @@ object BaichuanApiService {
 
     /**
      * 精準請求單一抽屜檔案 (Drawer-based API Fetch)
-     * URL: .../data/{category_code}.json
      */
     fun fetchCardsByCategory(
         categoryCode: String,
@@ -159,7 +234,6 @@ object BaichuanApiService {
 
         val request = Request.Builder()
             .url(url)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
             .get()
             .build()
 
@@ -181,7 +255,7 @@ object BaichuanApiService {
                         onResult(emptyList())
                     }
                 } else {
-                    if (code != 404) {
+                    if (code != 404 && code != 401 && code != 403) {
                         android.util.Log.w("BaichuanAPI", "Targeted Fetch 響應錯誤 [$categoryCode]: $code")
                     }
                     onResult(emptyList())
@@ -193,7 +267,6 @@ object BaichuanApiService {
 
     /**
      * 交叉抽屜並行請求 (Multi-Drawer Cross Fetch)
-     * 同時抓取多個類別檔案並進行結果合併
      */
     fun fetchCardsByCategories(
         categoryCodes: List<String>,
@@ -231,7 +304,6 @@ object BaichuanApiService {
     ) {
         val request = Request.Builder()
             .url(gitRawUrl)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
             .get()
             .build()
 
@@ -268,14 +340,9 @@ object BaichuanApiService {
             "title" to "【REPORT】$cardId",
             "body" to "Reason: $reason\nReporter: $reporterId\nTS: ${System.currentTimeMillis()}"
         )
-        
-        val auth = AUTH_VALUE
 
         val request = Request.Builder()
             .url(GITHUB_URL)
-            .addHeader(HEADER_ACCEPT, VALUE_ACCEPT)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
-            .addHeader(HEADER_AUTH, auth)
             .post(gson.toJson(reportData).toRequestBody("application/json".toMediaType()))
             .build()
 
@@ -299,13 +366,9 @@ object BaichuanApiService {
         val categoryCode = card.category_code
         val fileName = "$categoryCode.json"
         val contentsUrl = "$GITHUB_CONTENTS_BASE_URL$fileName"
-        
-        val auth = AUTH_VALUE
+
         val getRequest = Request.Builder()
             .url(contentsUrl)
-            .addHeader(HEADER_ACCEPT, VALUE_ACCEPT)
-            .addHeader(HEADER_USER_AGENT, VALUE_USER_AGENT)
-            .addHeader(HEADER_AUTH, auth)
             .get()
             .build()
 
@@ -328,7 +391,7 @@ object BaichuanApiService {
                         val decoded = android.util.Base64.decode(base64Content.replace("\n", ""), android.util.Base64.DEFAULT)
                         val json = String(decoded)
                         val existingCards = gson.fromJson(json, Array<RequirementCard>::class.java).toMutableList()
-                        
+
                         val removed = existingCards.removeAll { it.card_id == card.card_id }
                         if (removed) {
                             writeToGitHub(contentsUrl, existingCards, sha, onSuccess, onError)
@@ -341,6 +404,8 @@ object BaichuanApiService {
                     }
                 } else if (code == 404) {
                     onSuccess()
+                } else if (code == 401 || code == 403) {
+                    onError("401 Unauthorized")
                 } else {
                     android.util.Log.e("BaichuanAPI", "Delete/Get 錯誤 HTTP $code: $bodyString")
                     onError("HTTP $code: $bodyString")

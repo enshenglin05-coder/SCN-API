@@ -8,21 +8,82 @@ object UserIdentityManager {
 
     private const val PREF_NAME = "user_identity_prefs"
     private const val KEY_USER_ID = "my_device_id"
+    private const val KEY_AUTH_TOKEN = "auth_token"
+
+    private var appContext: Context? = null
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
 
     /**
      * App 啟動時取得或生成唯一的「登錄人 ID」
      */
-    fun getMyDeviceId(context: Context): String {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    fun getMyDeviceId(context: Context? = appContext): String {
+        val ctx = context ?: appContext
+        if (ctx == null) return UUID.randomUUID().toString()
+
+        val prefs = ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         var userId = prefs.getString(KEY_USER_ID, null)
 
         if (userId.isNullOrEmpty()) {
-            // 優先使用 ANDROID_ID，若取得失敗則生成 UUID
-            userId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            userId = Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID)
                 ?: UUID.randomUUID().toString()
             prefs.edit().putString(KEY_USER_ID, userId).apply()
         }
         return userId
+    }
+
+    /**
+     * 取得目前存放的 Auth Token (若無本地 Token，自動回退至 BuildConfig.GITHUB_TOKEN)
+     */
+    fun getAuthToken(context: Context? = appContext): String {
+        val ctx = context ?: appContext
+        val savedToken = ctx?.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            ?.getString(KEY_AUTH_TOKEN, null)
+
+        if (!savedToken.isNullOrBlank()) {
+            return savedToken
+        }
+        return BuildConfig.GITHUB_TOKEN
+    }
+
+    /**
+     * 儲存新的 Auth Token
+     */
+    fun saveAuthToken(context: Context? = appContext, token: String) {
+        val ctx = context ?: appContext ?: return
+        ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_AUTH_TOKEN, token)
+            .apply()
+    }
+
+    /**
+     * 清除 Auth Token (例如過期或登出)
+     */
+    fun clearAuthToken(context: Context? = appContext) {
+        val ctx = context ?: appContext ?: return
+        ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_AUTH_TOKEN)
+            .apply()
+    }
+
+    /**
+     * 自動重新嘗試刷新/重新獲取有效 Token
+     */
+    fun refreshAuthToken(context: Context? = appContext): Boolean {
+        // 1. 清除舊有失聯的快取 Token
+        clearAuthToken(context)
+
+        // 2. 重新自 BuildConfig 設定載入備援 Token
+        val fallbackToken = BuildConfig.GITHUB_TOKEN
+        if (fallbackToken.isNotBlank()) {
+            saveAuthToken(context, fallbackToken)
+            return true
+        }
+        return false
     }
 
     /**

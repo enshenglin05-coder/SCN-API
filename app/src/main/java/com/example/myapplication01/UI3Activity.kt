@@ -44,7 +44,7 @@ import com.google.android.material.tabs.TabLayout
 import java.text.SimpleDateFormat
 import java.util.*
 
-class UI3Activity : AppCompatActivity() {
+class UI3Activity : BaseActivity() {
 
     private lateinit var viewPager: ViewPager2
     private var adapter: RequirementAdapter? = null

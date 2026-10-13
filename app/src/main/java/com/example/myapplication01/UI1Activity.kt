@@ -40,7 +40,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import java.util.Locale
 
-class UI1Activity : AppCompatActivity() {
+class UI1Activity : BaseActivity() {
 
     private lateinit var ttsManager: TtsManager
     private var currentLanguageCode = "zh-TW"

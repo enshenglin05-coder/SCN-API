@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 
-class TermsPrivacyActivity : AppCompatActivity() {
+class TermsPrivacyActivity : BaseActivity() {
 
     private lateinit var cbAgree: CheckBox
     private lateinit var tvTermsLinks: TextView

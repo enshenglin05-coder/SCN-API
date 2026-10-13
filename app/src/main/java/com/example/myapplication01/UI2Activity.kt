@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-class UI2Activity : AppCompatActivity() {
+class UI2Activity : BaseActivity() {
 
     private lateinit var rvMainCategories: RecyclerView
     private lateinit var topBarUI2: View
