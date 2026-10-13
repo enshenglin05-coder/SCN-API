@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     implementation(libs.play.services.location)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     // Compose
     val composeBom = platform(libs.androidx.compose.bom)

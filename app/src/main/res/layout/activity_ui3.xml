@@ -6,12 +6,20 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <!-- ViewPager2 用於全頁卡片 Snap 滑動流 -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPagerUI3"
+    <!-- 下拉刷新容器 -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayoutUI3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:layout_height="match_parent">
+
+        <!-- ViewPager2 用於全頁卡片 Snap 滑動流 -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerUI3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- 頂部懸浮吸頂列 (Sticky Header) -->
     <androidx.compose.ui.platform.ComposeView

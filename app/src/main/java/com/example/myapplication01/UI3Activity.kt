@@ -48,6 +48,7 @@ class UI3Activity : BaseActivity() {
 
     private lateinit var viewPager: ViewPager2
     private var adapter: RequirementAdapter? = null
+    private var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout? = null
 
     // 發布表單內部的視圖引用 (由 Adapter 繫結時更新)
     private var tvCategoryCombined: TextView? = null
@@ -270,6 +271,11 @@ class UI3Activity : BaseActivity() {
         
         applyGlobalTheme()
         setupRainbowEngine()
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayoutUI3)
+        swipeRefreshLayout?.setOnRefreshListener {
+            applyFilterAndRefresh()
+        }
 
         applyFilterAndRefresh()
     }
@@ -939,6 +945,7 @@ class UI3Activity : BaseActivity() {
             Toast.makeText(this, "請點擊上方『我的位置』刷新列表", Toast.LENGTH_SHORT).show()
             filteredCards.clear()
             adapter?.updateData(filteredCards, userLat, userLng)
+            swipeRefreshLayout?.isRefreshing = false
             return
         }
 
@@ -954,6 +961,7 @@ class UI3Activity : BaseActivity() {
         filteredCards.clear()
         filteredCards.addAll(cards)
         adapter?.updateData(filteredCards, userLat, userLng)
+        swipeRefreshLayout?.isRefreshing = false
     }
 
     private fun updateUIList() {
@@ -968,6 +976,7 @@ class UI3Activity : BaseActivity() {
         filteredCards.clear()
         filteredCards.addAll(cards)
         adapter?.updateData(filteredCards, userLat, userLng)
+        swipeRefreshLayout?.isRefreshing = false
     }
 
     private fun validateInput(): Boolean {
