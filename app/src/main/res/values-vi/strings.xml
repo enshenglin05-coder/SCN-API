@@ -1,0 +1,208 @@
+<resources>
+    <string name="app_name">百川</string>
+    <string name="ui2_title">Giao diện Chọn Mục (Ăn, Mặc, Ở, Đi, Học, Chơi)</string>
+    <string name="selection_status_prefix">Đang chọn: </string>
+    <string name="none_selected">Chưa chọn</string>
+    <string name="cat_1_food">1. Ẩm thực</string>
+    <string name="cat_2_clothing">2. Thời trang</string>
+    <string name="cat_3_housing">3. Nhà ở</string>
+    <string name="cat_4_transport">4. Giao hàng·Di chuyển</string>
+    <string name="cat_5_education">5. Giáo dục</string>
+    <string name="cat_6_entertainment">6. Giải trí</string>
+    <string name="cat_7_medical">7. Y tế</string>
+    <string name="cat_8_secondhand">8. Đồ cũ</string>
+    <string name="cat_9_pet">9. Thú cưng</string>
+    <string name="cat_10_service">10. Dịch vụ</string>
+    <string name="cat_11_reserved">11. Nhóm dự trữ</string>
+
+    <!-- Sub-items Vietnamese -->
+    <string name="sub_item_1_1">Ẩm thực Trung Hoa</string>
+    <string name="sub_item_1_2">Món Tây</string>
+    <string name="sub_item_1_3">Món Nhật</string>
+    <string name="sub_item_1_4">Điểm tâm</string>
+    <string name="sub_item_1_5">Thức ăn nhanh</string>
+    <string name="sub_item_1_6">Tráng miệng/Đồ uống</string>
+    <string name="sub_item_1_7">Lẩu &amp; Nướng</string>
+    <string name="sub_item_1_8">Nguyên liệu</string>
+
+    <string name="sub_item_2_1">Thời trang hot trend</string>
+    <string name="sub_item_2_2">Giày dép &amp; Túi xách</string>
+    <string name="sub_item_2_3">Phụ kiện</string>
+    <string name="sub_item_2_4">Thể thao/Dã ngoại</string>
+    <string name="sub_item_2_5">Đồ bầu/Trẻ em</string>
+    <string name="sub_item_2_6">Đồ lót/Đồ ngủ</string>
+    <string name="sub_item_2_7">Vải vóc</string>
+    <string name="sub_item_2_8">May mặc theo yêu cầu</string>
+
+    <string name="sub_item_3_1">Thông tin thuê nhà</string>
+    <string name="sub_item_3_2">Đồ dùng gia đình</string>
+    <string name="sub_item_3_3">Trang trí nội thất</string>
+    <string name="sub_item_3_4">Quản lý tòa nhà</string>
+    <string name="sub_item_3_5">Điện gia dụng</string>
+    <string name="sub_item_3_6">Nội thất phòng ngủ</string>
+    <string name="sub_item_3_7">Dịch vụ vệ sinh</string>
+    <string name="sub_item_3_8">Chuyển nhà</string>
+
+    <string name="sub_item_4_1">Taxi &amp; Đặt xe</string>
+    <string name="sub_item_4_2">Thuê xe máy/Ô tô</string>
+    <string name="sub_item_4_3">Bãi đỗ &amp; Cây xăng</string>
+    <string name="sub_item_4_4">Bản đồ/Dẫn đường</string>
+    <string name="sub_item_4_5">Trạm sạc</string>
+    <string name="sub_item_4_6">Cứu hộ xe\nLái xe hộ</string>
+    <string name="sub_item_4_7">Vé máy bay</string>
+    <string name="sub_item_4_8">Logistics/Giao hàng</string>
+
+    <string name="sub_item_5_1">Học ngoại ngữ</string>
+    <string name="sub_item_5_2">Trường học/Trung tâm</string>
+    <string name="sub_item_5_3">Sách &amp; Đọc</string>
+    <string name="sub_item_5_4">Nghệ thuật/Năng khiếu</string>
+    <string name="sub_item_5_5">Giáo dục thể chất</string>
+    <string name="sub_item_5_6">Tư vấn du học</string>
+    <string name="sub_item_5_7">Học trực tuyến</string>
+    <string name="sub_item_5_8">Văn phòng phẩm</string>
+
+    <string name="sub_item_6_1">Tham quan/Giải trí</string>
+    <string name="sub_item_6_2">Karaoke &amp; Phim</string>
+    <string name="sub_item_6_3">Game &amp; Anime</string>
+    <string name="sub_item_6_4">Thể hình/Gym</string>
+    <string name="sub_item_6_5">Vé biểu diễn</string>
+    <string name="sub_item_6_6">Vé tham quan</string>
+    <string name="sub_item_6_7">Karaoke</string>
+    <string name="sub_item_6_8">Công viên chủ đề</string>
+
+    <string name="sub_item_7_1">Nhà thuốc\nGiao thuốc</string>
+    <string name="sub_item_7_2">Phòng khám\nHẹn lịch khám</string>
+    <string name="sub_item_7_3">Chăm sóc người bệnh\nTại nhà</string>
+    <string name="sub_item_7_4">Thẩm mỹ\nChăm sóc da</string>
+    <string name="sub_item_7_5">Trung tâm xét nghiệm\nKiểm tra y khoa</string>
+    <string name="sub_item_7_6">Vật lý trị liệu\nChâm cứu</string>
+    <string name="sub_item_7_7">Thiết bị y tế\nThuê và bán</string>
+    <string name="sub_item_7_8">Khác\nTư vấn sức khỏe</string>
+
+    <string name="sub_item_8_1">Điện thoại cũ\nĐồ công nghệ 3C</string>
+    <string name="sub_item_8_2">Mua bán xe\n2 bánh 4 bánh</string>
+    <string name="sub_item_8_3">Điện máy nội thất\nĐồ gia dụng cũ</string>
+    <string name="sub_item_8_4">Thời trang hàng hiệu\nQuần áo cũ</string>
+    <string name="sub_item_8_5">Đồ dùng mẹ và bé\nĐồ chơi xe đẩy</string>
+    <string name="sub_item_8_6">Máy chơi game\nPhụ kiện Anime</string>
+    <string name="sub_item_8_7">Đồ dã ngoại\nDụng cụ thể thao</string>
+    <string name="sub_item_8_8">Đồ cũ tổng hợp\nGiao dịch trực tiếp</string>
+
+    <string name="sub_item_9_1">Tắm thú cưng\nLàm đẹp tạo kiểu</string>
+    <string name="sub_item_9_2">Gửi thú cưng\nChăm sóc trong ngày</string>
+    <string name="sub_item_9_3">Phòng khám thú y\nCấp cứu tiêm phòng</string>
+    <string name="sub_item_9_4">Vận chuyển thú cưng\nTaxi thú cưng</string>
+    <string name="sub_item_9_5">Cho ăn tại nhà\nDắt thú đi dạo</string>
+    <string name="sub_item_9_6">Đồ dùng thú cưng\nThức ăn chính phụ</string>
+    <string name="sub_item_9_7">Tìm thú thất lạc\nNhận nuôi</string>
+    <string name="sub_item_9_8">Khác\nDịch vụ đời sống</string>
+
+    <string name="sub_item_10_1">Việc thời vụ\nNhân lực sự kiện</string>
+    <string name="sub_item_10_2">Dọn dẹp nhà\nDiệt côn trùng</string>
+    <string name="sub_item_10_3">Sửa chữa\nĐiện nước nội thất</string>
+    <string name="sub_item_10_4">Xếp hàng hộ\nChạy vặt</string>
+    <string name="sub_item_10_5">Tổ chức sự kiện\nQuay phim MC</string>
+    <string name="sub_item_10_6">Tư vấn chuyên môn\nDịch thuật</string>
+    <string name="sub_item_10_7">Cứu hộ khẩn cấp\nHỗ trợ cộng đồng</string>
+    <string name="sub_item_10_8">Dịch vụ tổng hợp\nHỗ trợ khác</string>
+
+    <!-- vi Localized Faiths -->
+    <string name="card_vi_buddhist_name">Phật giáo Bình an</string>
+    <string name="card_vi_buddhist_desc">Cầu mong Phật Bồ Tát ban phước lành và bình an cho bạn.</string>
+    <string name="card_vi_christian_name">Công giáo Chúc lành</string>
+    <string name="card_vi_christian_desc">Chúa chúc lành và luôn ở cùng bạn.</string>
+    <string name="card_vi_caodai_name">Đạo Cao Đài</string>
+    <string name="card_vi_caodai_desc">Cầu mong vạn sự tốt lành và may mắn đến với bạn.</string>
+    <string name="card_vi_none_name">Một ngày thuận lợi</string>
+    <string name="card_vi_none_desc">Chúc bạn một ngày luôn hạnh phúc và mọi sự thuận lợi.</string>
+
+    <!-- Localized Faiths (Vietnamese) -->
+    <string name="religion_vi_buddhist_title">Phật giáo (Buddhism)</string>
+    <string name="religion_vi_buddhist_desc">Cầu mong Phật Bồ Tát ban phước lành và bình an cho bạn.</string>
+    <string name="religion_vi_catholic_title">Công giáo (Catholicism)</string>
+    <string name="religion_vi_catholic_desc">Chúa chúc lành và luôn ở cùng bạn.</string>
+    <string name="religion_vi_caodai_title">Đạo Cao Đài / Dân gian</string>
+    <string name="religion_vi_caodai_desc">Cầu mong vạn sự tốt lành và may mắn đến với bạn.</string>
+    <string name="religion_vi_general_title">Lời chúc chung</string>
+    <string name="religion_vi_general_desc">Chúc bạn một ngày luôn hạnh phúc và mọi sự thuận lợi.</string>
+
+    <string name="ui1_hint">Vui lòng chọn lời chúc / tôn giáo (Bắt buộc):</string>
+    <string name="btn_enter_ui2">Tiếp theo</string>
+    <string name="ambient_light">Bật đèn viền viền</string>
+    <string name="exit">Thoát</string>
+    <string name="label_rainbow_switch">Bật đèn cầu vồng</string>
+    <string name="error_select_card">Vui lòng chọn lời chúc / tôn giáo trước!</string>
+    <string name="distance_setting_prefix">Thiết lập khoảng cách: </string>
+    <string name="km_unit">KM</string>
+    <string name="dialog_distance_title">Cài đặt khoảng cách tìm kiếm (KM)</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+    <string name="switch_ai_label">AI Bách Xuyên</string>
+    <string name="tab_need">1A Nhu cầu</string>
+    <string name="tab_supply">1B Cung cấp</string>
+    <string name="btn_get_gps">Lấy vị trí GPS</string>
+    <string name="label_gps_coords">📍 Vĩ độ: %1$s, Kinh độ: %2$s</string>
+    <string name="hint_description">Nhập mô tả chi tiết...</string>
+    <string name="hint_social_link">🔗 FB / IG / Threads / X URL...</string>
+    <string name="hint_video_link">🌐 YouTube / TikTok / Web URL...</string>
+    <string name="label_social_hint">📌 Link ảnh/mạng xã hội chi tiết</string>
+    <string name="label_publish_hint">📌 Trường mô tả và điều kiện</string>
+    <string name="label_contact_method">Chọn phương thức liên lạc:</string>
+    <string name="hint_contact_id">Nhập ID liên lạc</string>
+    <string name="btn_publish_text">Đăng ngay (60s)</string>
+    <string name="btn_publishing">Đang đăng...</string>
+    <string name="title_nearby_list">Yêu cầu và Cung cấp xung quanh</string>
+    <!-- Card Compact Strings -->
+    <string name="card_lbl_dist">Khoảng cách</string>
+    <string name="card_unit_km">km</string>
+    <string name="card_lbl_time">Đã đăng</string>
+    <string name="card_unit_min">phút trước</string>
+    <string name="card_lbl_like">Thích</string>
+    <string name="card_btn_more">Chi tiết</string>
+    <string name="card_btn_map">Google Map</string>
+    <string name="card_btn_ext">Giới thiệu Cá nhân / Sản phẩm</string>
+
+    <!-- Report Dialog Strings -->
+    <string name="report_title">Báo cáo nội dung</string>
+    <string name="label_report">Báo cáo</string>
+    <string name="report_opt_1">Lừa đảo hoặc thông tin sai sự thật</string>
+    <string name="report_opt_2">Nội dung khiêu dâm hoặc người lớn</string>
+    <string name="report_opt_3">Bạo lực, thù ghét hoặc quấy rối</string>
+    <string name="report_opt_4">Bán hoặc quảng bá hàng cấm</string>
+    <string name="report_opt_5">Vi phạm khác</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_submit">Gửi báo cáo</string>
+    <string name="report_msg_success">Đã nhận được báo cáo của bạn</string>
+
+    <!-- Publishing Page Strings -->
+    <string name="btn_location_acquired">📍 Đã lấy vị trí</string>
+    <string name="btn_location_click_to_get">📍 Nhấn để lấy vị trí</string>
+    <string name="error_no_location_publish">Chưa có vị trí, vui lòng nhấn nút phía trên!</string>
+    <string name="error_empty_contact_publish">Vui lòng nhập ID liên lạc!</string>
+    <string name="error_empty_description_publish">Vui lòng nhập mô tả!</string>
+    <string name="msg_publish_success_default">Đăng thành công, chúc bạn mọi điều tốt đẹp!</string>
+    <string name="btn_clear_draft">🗑️ Xóa bản nháp</string>
+    <string name="dialog_clear_draft_title">Xóa bản nháp</string>
+    <string name="dialog_clear_draft_msg">Bạn có chắc chắn muốn xóa tất cả nội dung đã nhập và viết lại không?</string>
+    <string name="msg_draft_cleared">Bản nháp đã được xóa</string>
+    <string name="welcome_prefix">Chào mừng bạn đến với </string>
+    <string name="btn_disagree_exit">Từ chối và Thoát</string>
+    <string name="terms_checkbox_text">Tôi đã đọc và đồng ý với 《Điều khoản dịch vụ》 và 《Chính sách bảo mật》</string>
+    <string name="terms_service_label">Điều khoản dịch vụ</string>
+    <string name="privacy_policy_label">Chính sách bảo mật</string>
+    <string name="btn_agree_continue">Đồng ý và Tiếp tục</string>
+    <string name="error_must_agree_terms">Vui lòng đọc và đồng ý với Điều khoản và Chính sách bảo mật trước</string>
+    <string name="dialog_terms_title">Điều khoản và Chính sách bảo mật</string>
+    <string name="terms_content_full">【Tóm tắt Điều khoản dịch vụ và Chính sách bảo mật】\n\nChào mừng bạn đến với nền tảng của chúng tôi! Để bảo vệ quyền lợi của bạn, vui lòng đọc kỹ nội dung sau trước khi đăng ký/đăng nhập:\n\n1. Thu thập dữ liệu và Dịch vụ định vị:\n   Để khớp nối nhu cầu và cung cấp tại địa phương, nền tảng sẽ thu thập vị trí GPS và thông tin liên hệ (như LINE ID, số điện thoại) của bạn sau khi được cấp quyền, chỉ dùng cho mục đích đăng tin và kết nối.\n\n2. Trách nhiệm đăng tin:\n   Người dùng phải đảm bảo thông tin, hình ảnh và liên kết đăng tải là trung thực và hợp pháp. Mọi nội dung liên quan đến lừa đảo, hàng cấm, dịch vụ bất hợp pháp sẽ bị khóa tài khoản và xử lý theo pháp luật.\n\n3. Tuyên bố miễn trừ trách nhiệm:\n   Nền tảng chỉ cung cấp kênh kết nối thông tin. Các giao dịch riêng tư, thực hiện dịch vụ và thanh toán giữa người dùng và người cung cấp cần được hai bên tự thẩm định. Nền tảng không chịu trách nhiệm cho các tổn thất giao dịch không chính thức.\n\n4. Đồng ý công khai thông tin liên hệ:\n   Khi đăng tin nhu cầu hoặc cung cấp, bạn đồng ý hiển thị phương thức liên lạc đã nhập (như LINE ID, KakaoTalk) cho người dùng phù hợp để kết nối.</string>
+    <string name="consent_title">Chào mừng bạn</string>
+    <string name="consent_terms">Tôi đã đọc và đồng ý với Điều khoản dịch vụ &amp; Chính sách bảo mật</string>
+    <string name="consent_gps">Cấp quyền truy cập vị trí GPS để tìm nhu cầu 12 giờ xung quanh</string>
+    <string name="btn_disagree">Từ chối</string>
+    <string name="btn_agree">Đồng ý &amp; Tiếp tục</string>
+    <string name="gps_denied_msg">Ứng dụng cần quyền truy cập vị trí để cung cấp dịch vụ. Vui lòng bật trong Cài đặt.</string>
+    <string name="btn_go_to_settings">Đi tới Cài đặt</string>
+    <string name="msg_max_length_reached">Đã đạt giới hạn tối đa 120 ký tự</string>
+    <string name="btn_more">(Xem thêm)</string>
+    <string name="btn_less">(Thu gọn)</string>
+    <string name="platform_phone">Số điện thoại</string>
+</resources>

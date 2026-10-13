@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 128 色流光邊框裝飾層 (套用 UI1 定位邏輯) -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/cvBorderViewport"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="42dp">
+
+        <!-- 區塊一：狀態與切換 (Top Bar + 1A/1B Toggle + Coords) -->
+        <LinearLayout
+            android:id="@+id/blockOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="2dp">
+
+            <LinearLayout
+                android:id="@+id/topBarUI3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnBackUI3"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_revert"
+                    app:tint="#FFFFFF"
+                    android:scaleType="centerInside" />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp">
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/cvBorderLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <TextView
+                        android:id="@+id/btnLocationUI3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingHorizontal="12dp"
+                        android:text="@string/btn_location_click_to_get"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tvUI3CategoryCombined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="【2-1】潮汐"
+                    android:textColor="#FFCC00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="6dp">
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/cvBorderTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayoutPostType"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    app:tabIndicatorFullWidth="true"
+                    app:tabIndicatorColor="#00E5FF"
+                    app:tabIndicatorHeight="3dp"
+                    app:tabSelectedTextColor="#00E5FF"
+                    app:tabTextColor="#BBBBBB"
+                    app:tabRippleColor="@null"
+                    app:tabTextAppearance="@android:style/TextAppearance.Small">
+                    <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_need" />
+                    <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_supply" />
+                </com.google.android.material.tabs.TabLayout>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvLiveLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#CCFFFFFF"
+                android:textSize="11sp"
+                android:text="[緯度: XX.XXXXXX, 經度: XXX.XXXXXX]" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_marginBottom="6dp">
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/cvBorderDesc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_mist_card"
+                    android:padding="10dp">
+
+                    <EditText
+                        android:id="@+id/etPostDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/hint_description"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#99FFFFFF"
+                        android:textSize="14sp"
+                        android:gravity="top|start"
+                        android:inputType="textMultiLine"
+                        android:maxLines="4"
+                        android:paddingEnd="12dp" />
+
+                    <!-- 半透明閃爍直條指示器 -->
+                    <View
+                        android:id="@+id/vDescIndicator"
+                        android:layout_width="3dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="2dp"
+                        android:background="#80FFFFFF"
+                        android:alpha="0.5" />
+
+                    <TextView
+                        android:id="@+id/tvCharCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:text="( 0 / 100 )"
+                        android:textColor="#88FFFFFF"
+                        android:textSize="11sp" />
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <!-- 區塊三：結構精準修正 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_social_link_hint"
+                android:textColor="#BBFFFFFF"
+                android:textSize="11sp"
+                android:alpha="0.75"
+                android:layout_marginBottom="2dp"
+                android:paddingHorizontal="4dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="6dp">
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/cvBorderSocial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <EditText
+                    android:id="@+id/etSocialLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_frosted_fill"
+                    android:hint="@string/hint_social_merged"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#66FFFFFF"
+                    android:textSize="13sp"
+                    android:singleLine="true"
+                    android:drawableStart="@android:drawable/ic_menu_share"
+                    android:drawablePadding="8dp"
+                    app:drawableTint="#66FFFFFF" />
+            </FrameLayout>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
+                android:layout_marginBottom="6dp">
+                <!-- RadioButtons with FrameLayout wrappers for borders as in current UI3 -->
+                <FrameLayout android:layout_width="0dp" android:layout_height="40dp" android:layout_columnWeight="1" android:layout_margin="4dp">
+                    <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderLine" android:layout_width="match_parent" android:layout_height="match_parent" />
+                    <RadioButton android:id="@+id/rbLine" android:layout_width="match_parent" android:layout_height="match_parent" android:button="@null" android:background="@drawable/bg_platform_selector" android:text="LINE" android:textColor="@color/platform_text_selector" android:gravity="center" android:textSize="13sp" android:checked="true" />
+                </FrameLayout>
+                <FrameLayout android:layout_width="0dp" android:layout_height="40dp" android:layout_columnWeight="1" android:layout_margin="4dp">
+                    <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderPhonePlatform" android:layout_width="match_parent" android:layout_height="match_parent" />
+                    <RadioButton android:id="@+id/rbPhonePlatform" android:layout_width="match_parent" android:layout_height="match_parent" android:button="@null" android:background="@drawable/bg_platform_selector" android:text="Phone" android:textColor="@color/platform_text_selector" android:gravity="center" android:textSize="13sp" />
+                </FrameLayout>
+                <FrameLayout android:layout_width="0dp" android:layout_height="40dp" android:layout_columnWeight="1" android:layout_margin="4dp">
+                    <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderTelegram" android:layout_width="match_parent" android:layout_height="match_parent" />
+                    <RadioButton android:id="@+id/rbTelegram" android:layout_width="match_parent" android:layout_height="match_parent" android:button="@null" android:background="@drawable/bg_platform_selector" android:text="Telegram" android:textColor="@color/platform_text_selector" android:gravity="center" android:textSize="13sp" />
+                </FrameLayout>
+                <FrameLayout android:layout_width="0dp" android:layout_height="40dp" android:layout_columnWeight="1" android:layout_margin="4dp">
+                    <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderWechat" android:layout_width="match_parent" android:layout_height="match_parent" />
+                    <RadioButton android:id="@+id/rbWechat" android:layout_width="match_parent" android:layout_height="40dp" android:button="@null" android:background="@drawable/bg_platform_selector" android:text="WeChat" android:textColor="@color/platform_text_selector" android:gravity="center" android:textSize="13sp" />
+                </FrameLayout>
+            </GridLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="6dp">
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/cvBorderContactId"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <EditText
+                    android:id="@+id/etContactId"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_frosted_fill"
+                    android:hint="@string/hint_contact_id_specific"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#66FFFFFF"
+                    android:textSize="13sp"
+                    android:singleLine="true" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="6dp">
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/cvBorderPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <EditText
+                    android:id="@+id/etPhoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_frosted_fill"
+                    android:hint="@string/hint_phone_number"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#66FFFFFF"
+                    android:textSize="13sp"
+                    android:inputType="phone"
+                    android:singleLine="true"
+                    android:drawableStart="@android:drawable/ic_menu_call"
+                    android:drawablePadding="8dp"
+                    app:drawableTint="#66FFFFFF" />
+            </FrameLayout>
+
+            <!-- 底部按鈕區 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderClear" android:layout_width="match_parent" android:layout_height="match_parent" />
+                        <TextView android:id="@+id/btnClearDraft" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/btn_clear_draft" android:textColor="#BBBBBB" android:textSize="12sp" android:gravity="center" android:background="@android:color/transparent" android:clickable="true" android:focusable="true" />
+                    </FrameLayout>
+                    <View android:layout_width="8dp" android:layout_height="0dp" />
+                    <FrameLayout android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderSave" android:layout_width="match_parent" android:layout_height="match_parent" />
+                        <TextView android:id="@+id/btnSaveDraft" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/btn_save_draft" android:textColor="#BBBBBB" android:textSize="12sp" android:gravity="center" android:background="@android:color/transparent" android:clickable="true" android:focusable="true" />
+                    </FrameLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderRefresh" android:layout_width="match_parent" android:layout_height="match_parent" />
+                        <Button android:id="@+id/btnRefreshList" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@android:color/transparent" app:backgroundTint="@null" android:text="@string/btn_refresh_list" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:gravity="center" android:padding="0dp" android:drawableStart="@android:drawable/stat_notify_sync" android:drawablePadding="4dp" app:drawableTint="#FFFFFF" />
+                    </FrameLayout>
+                    <View android:layout_width="8dp" android:layout_height="0dp" />
+                    <FrameLayout android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView android:id="@+id/cvBorderPublish" android:layout_width="match_parent" android:layout_height="match_parent" />
+                        <Button android:id="@+id/btnPublish" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@android:color/transparent" app:backgroundTint="@null" android:text="@string/btn_publish_text" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:gravity="center" android:padding="0dp" android:drawableStart="@android:drawable/btn_star_big_on" android:drawablePadding="4dp" app:drawableTint="#FFFFFF" />
+                    </FrameLayout>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tvScrollHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_scroll_down_hint_need"
+                    android:textColor="#00FFC2"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingVertical="4dp"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:shadowColor="#8000FFC2"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="8" />
+            </LinearLayout>
+
+            <!-- 隱藏但保留舊按鈕 -->
+            <RadioButton android:id="@+id/rbWhatsapp" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+            <Button android:id="@+id/btnGetLocation" android:layout_width="1dp" android:layout_height="1dp" android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

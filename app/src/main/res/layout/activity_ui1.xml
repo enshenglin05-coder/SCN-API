@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <LinearLayout
+        android:id="@+id/mainContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingBottom="14dp">
+
+        <!-- 1. 頂部列 (Top Bar) -->
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="16dp"
+            android:background="@android:color/transparent">
+
+            <TextView
+                android:id="@+id/btnExit"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_capsule_button"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="@string/exit"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btnLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_capsule_button"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="📍 我的位置"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:drawablePadding="4dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btnLanguagePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_capsule_button"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:text="繁體中.."
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- 隱藏實際作用的 Spinner -->
+            <Spinner
+                android:id="@+id/spinnerLanguage"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <!-- 2. 中間內容區 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp"
+                android:text="請選擇心靈祝福 / 信仰類別 (必選)："
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewBlessings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="none" />
+        </LinearLayout>
+
+        <!-- 3. 底部固定控制列 -->
+        <LinearLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="40dp"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <CheckBox
+                    android:id="@+id/cbSelectionVerify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:buttonTint="#4285F4"
+                    android:checked="false"
+                    android:clickable="false"
+                    android:focusable="false" />
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEnterUI2"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="進入項目選擇介面 (UI2)"
+                        android:backgroundTint="@android:color/transparent"
+                        app:strokeColor="#4285F4"
+                        app:strokeWidth="2dp"
+                        android:textColor="#4285F4"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:enabled="false"
+                        app:cornerRadius="28dp" />
+
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/borderEnterUI2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchRainbow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/label_rainbow_switch"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:checked="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

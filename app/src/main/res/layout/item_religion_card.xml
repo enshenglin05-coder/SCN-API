@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/religionCardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:background="@android:color/transparent">
+
+    <!-- 將高度從 130dp 增加至 160dp，確保內容不被截斷 -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/cardComposeContent"
+        android:layout_width="match_parent"
+        android:layout_height="160dp" />
+
+</FrameLayout>

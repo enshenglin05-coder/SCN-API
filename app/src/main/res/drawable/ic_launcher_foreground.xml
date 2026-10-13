@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 紅 -->
+    <path
+        android:pathData="M9,54 C27,48 81,48 99,54"
+        android:strokeColor="#FFFF1744"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 橙 -->
+    <path
+        android:pathData="M9,54 C27,50 81,50 99,54"
+        android:strokeColor="#FFFF7A00"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 黃 -->
+    <path
+        android:pathData="M9,54 C27,52 81,52 99,54"
+        android:strokeColor="#FFFFD600"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 綠 -->
+    <path
+        android:pathData="M9,54 C27,54 81,54 99,54"
+        android:strokeColor="#00F56A"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 藍 -->
+    <path
+        android:pathData="M9,54 C27,56 81,56 99,54"
+        android:strokeColor="#00A8FF"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 靛 -->
+    <path
+        android:pathData="M9,54 C27,58 81,58 99,54"
+        android:strokeColor="#304FFE"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+    <!-- 紫 -->
+    <path
+        android:pathData="M9,54 C27,60 81,60 99,54"
+        android:strokeColor="#9C27FF"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"/>
+
+</vector>

@@ -1,0 +1,207 @@
+<resources>
+    <string name="app_name">百川</string>
+    <string name="ui2_title">항목 선택 인터페이스 (의식주행육락)</string>
+    <string name="selection_status_prefix">현재 선택: </string>
+    <string name="none_selected">선택 안 함</string>
+    <string name="cat_1_food">1. 음식</string>
+    <string name="cat_2_clothing">2. 의류</string>
+    <string name="cat_3_housing">3. 주거</string>
+    <string name="cat_4_transport">4. 이동·배달</string>
+    <string name="cat_5_education">5. 교육</string>
+    <string name="cat_6_entertainment">6. 오락</string>
+    <string name="cat_7_medical">7. 의료</string>
+    <string name="cat_8_secondhand">8. 중고 거래</string>
+    <string name="cat_9_pet">9. 반려동물</string>
+    <string name="cat_10_service">10. 서비스</string>
+    <string name="cat_11_reserved">11. 예약 풀</string>
+
+    <!-- Sub-items Korean -->
+    <string name="sub_item_1_1">중식</string>
+    <string name="sub_item_1_2">양식</string>
+    <string name="sub_item_1_3">일식</string>
+    <string name="sub_item_1_4">디저트/간식</string>
+    <string name="sub_item_1_5">패스트푸드</string>
+    <string name="sub_item_1_6">음료</string>
+    <string name="sub_item_1_7">샤브샤브/구이</string>
+    <string name="sub_item_1_8">식재료</string>
+
+    <string name="sub_item_2_1">트렌드 의류</string>
+    <string name="sub_item_2_2">신발 및 명품</string>
+    <string name="sub_item_2_3">액세서리</string>
+    <string name="sub_item_2_4">스포츠/아웃도어</string>
+    <string name="sub_item_2_5">아동복/임부복</string>
+    <string name="sub_item_2_6">속옷/잠옷</string>
+    <string name="sub_item_2_7">기능성 의류</string>
+    <string name="sub_item_2_8">맞춤 의류</string>
+
+    <string name="sub_item_3_1">임대 정보</string>
+    <string name="sub_item_3_2">홈 리빙</string>
+    <string name="sub_item_3_3">인테리어</string>
+    <string name="sub_item_3_4">관리/보안</string>
+    <string name="sub_item_3_5">가전제품</string>
+    <string name="sub_item_3_6">가구/침구</string>
+    <string name="sub_item_3_7">청소 서비스</string>
+    <string name="sub_item_3_8">이사</string>
+
+    <string name="sub_item_4_1">택시/호출</string>
+    <string name="sub_item_4_2">렌터카/바이크</string>
+    <string name="sub_item_4_3">주차장/주유소</string>
+    <string name="sub_item_4_4">네비/지도</string>
+    <string name="sub_item_4_5">충전소</string>
+    <string name="sub_item_4_6">견인 구조\n대리운전</string>
+    <string name="sub_item_4_7">항공권</string>
+    <string name="sub_item_4_8">물류/배송</string>
+
+    <string name="sub_item_5_1">어학/취미</string>
+    <string name="sub_item_5_2">학원/학교</string>
+    <string name="sub_item_5_3">도서/독서</string>
+    <string name="sub_item_5_4">예술/재능</string>
+    <string name="sub_item_5_5">스포츠 교육</string>
+    <string name="sub_item_5_6">유학 상담</string>
+    <string name="sub_item_5_7">온라인 학습</string>
+    <string name="sub_item_5_8">문구용품</string>
+
+    <string name="sub_item_6_1">관광/액티비티</string>
+    <string name="sub_item_6_2">노래방/영화</string>
+    <string name="sub_item_6_3">게임/애니</string>
+    <string name="sub_item_6_4">피트니스</string>
+    <string name="sub_item_6_5">공연 티켓</string>
+    <string name="sub_item_6_6">명소 티켓</string>
+    <string name="sub_item_6_7">노래방</string>
+    <string name="sub_item_6_8">테마파크</string>
+
+    <string name="sub_item_7_1">약국\n의약품 배송</string>
+    <string name="sub_item_7_2">병원 진료\n예약 상담</string>
+    <string name="sub_item_7_3">간병 서비스\n방문 케어</string>
+    <string name="sub_item_7_4">피부 관리\n성형 정보</string>
+    <string name="sub_item_7_5">검진 센터\n의료 검사</string>
+    <string name="sub_item_7_6">재활 치료\n한방 침구</string>
+    <string name="sub_item_7_7">의료 기기\n렌탈 및 판매</string>
+    <string name="sub_item_7_8">기타 의료\n건강 상담</string>
+
+    <string name="sub_item_8_1">중고폰\n디지털 3C</string>
+    <string name="sub_item_8_2">차량 매매\n2륜/4륜</string>
+    <string name="sub_item_8_3">가전 가구\n가정 유휴품</string>
+    <string name="sub_item_8_4">명품 의류\n구제 패션</string>
+    <string name="sub_item_8_5">유아 용품\n장난감 유모차</string>
+    <string name="sub_item_8_6">게임기\n애니 굿즈</string>
+    <string name="sub_item_8_7">아웃도어\n운동 기구</string>
+    <string name="sub_item_8_8">유휴품 종합\n직거래</string>
+
+    <string name="sub_item_9_1">반려동물 목욕\n미용 스타일링</string>
+    <string name="sub_item_9_2">반려동물 위탁\n데이케어</string>
+    <string name="sub_item_9_3">동물 병원\n응급 백신</string>
+    <string name="sub_item_9_4">반려동물 운송\n전용 택시</string>
+    <string name="sub_item_9_5">방문 급여\n산책 대행</string>
+    <string name="sub_item_9_6">반려동물 용품\n사료 간식</string>
+    <string name="sub_item_9_7">실종 신고\n유기동물 입양</string>
+    <string name="sub_item_9_8">기타 서비스\n펫 라이프</string>
+
+    <string name="sub_item_10_1">단기 알바\n행사 인력</string>
+    <string name="sub_item_10_2">가사 도우미\n소독 방역</string>
+    <string name="sub_item_10_3">전문 수리\n인테리어 설비</string>
+    <string name="sub_item_10_4">심부름\n현장 줄서기</string>
+    <string name="sub_item_10_5">행사 기획\n촬영 사회</string>
+    <string name="sub_item_10_6">전문 상담\n대필 번역</string>
+    <string name="sub_item_10_7">긴급 구조\n지역 상부상조</string>
+    <string name="sub_item_10_8">종합 서비스\n기타 도움</string>
+
+    <!-- ko Localized Faiths -->
+    <string name="card_ko_christian_name">개신교 축복</string>
+    <string name="card_ko_christian_desc">주님의 축복과 평화가 함께하길 기원합니다.</string>
+    <string name="card_ko_buddhist_name">불교 자비</string>
+    <string name="card_ko_buddhist_desc">부처님의 자비로 평안과 행복이 가득하길 바랍니다.</string>
+    <string name="card_ko_catholic_name">천주교 은혜</string>
+    <string name="card_ko_catholic_desc">주님의 은혜 안에 늘 평화롭기를 빕니다.</string>
+    <string name="card_ko_none_name">행복한 하루</string>
+    <string name="card_ko_none_desc">늘 건강하시고 행복한 하루가 되시길 바랍니다.</string>
+
+    <!-- Localized Faiths (Korean) -->
+    <string name="religion_ko_protestant_title">개신교 (Protestant)</string>
+    <string name="religion_ko_protestant_desc">주님의 축복과 평화가 함께하길 기원합니다.</string>
+    <string name="religion_ko_catholic_title">천주교 (Catholic)</string>
+    <string name="religion_ko_catholic_desc">주님의 은혜 안에 늘 평화롭기를 빕니다.</string>
+    <string name="religion_ko_buddhist_title">불교 (Buddhism)</string>
+    <string name="religion_ko_buddhist_desc">부처님의 자비로 평안과 행복이 가득하길 바랍니다.</string>
+    <string name="religion_ko_general_title">마음의 평화 / 일반</string>
+    <string name="religion_ko_general_desc">늘 건강하시고 행복한 하루가 되시길 바랍니다.</string>
+
+    <string name="ui1_hint">축복 / 종교 카테고리를 선택하세요 (필수):</string>
+    <string name="btn_enter_ui2">다음</string>
+    <string name="exit">나가기</string>
+    <string name="label_rainbow_switch">무지개 조명 활성화</string>
+    <string name="error_select_card">먼저 축복 / 종교 카테고리를 선택하세요!</string>
+    <string name="distance_setting_prefix">거리 설정: </string>
+    <string name="km_unit">KM</string>
+    <string name="dialog_distance_title">검색 거리 설정 (KM)</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
+    <string name="switch_ai_label">바이촨 AI</string>
+    <string name="tab_need">1A 필요해요</string>
+    <string name="tab_supply">1B 제공해요</string>
+    <string name="btn_get_gps">GPS 위치 가져오기</string>
+    <string name="label_gps_coords">📍 위도: %1$s, 경도: %2$s</string>
+    <string name="hint_description">상세 설명을 입력하세요...</string>
+    <string name="hint_social_link">🔗 FB / IG / Threads / X URL...</string>
+    <string name="hint_video_link">🌐 YouTube / TikTok / 사이트 URL...</string>
+    <string name="label_social_hint">📌 상세 사진/SNS 링크</string>
+    <string name="label_publish_hint">📌 조건 및 설명 필드</string>
+    <string name="label_contact_method">연락 방법 선택:</string>
+    <string name="hint_contact_id">연락처 ID 입력</string>
+    <string name="btn_publish_text">즉시 발행 (60s)</string>
+    <string name="btn_publishing">발행 중...</string>
+    <string name="title_nearby_list">주변 요청 및 공급</string>
+    <!-- Card Compact Strings -->
+    <string name="card_lbl_dist">거리</string>
+    <string name="card_unit_km">km</string>
+    <string name="card_lbl_time">게시됨</string>
+    <string name="card_unit_min">분 전</string>
+    <string name="card_lbl_like">좋아요</string>
+    <string name="card_btn_more">상세보기</string>
+    <string name="card_btn_map">Google Map</string>
+    <string name="card_btn_ext">프로필 / 제품 소개</string>
+
+    <!-- Report Dialog Strings -->
+    <string name="report_title">콘텐츠 신고</string>
+    <string name="label_report">신고</string>
+    <string name="report_opt_1">사기, 기만 또는 허위 정보</string>
+    <string name="report_opt_2">음란물 또는 성인 콘텐츠</string>
+    <string name="report_opt_3">폭력, 증오 또는 괴롭힘</string>
+    <string name="report_opt_4">규제 물품 판매/홍보</string>
+    <string name="report_opt_5">기타 위반 사항</string>
+    <string name="btn_cancel">취소</string>
+    <string name="btn_submit">신고 제출</string>
+    <string name="report_msg_success">신고가 접수되었습니다</string>
+
+    <!-- Publishing Page Strings -->
+    <string name="btn_location_acquired">📍 위치 획득됨</string>
+    <string name="btn_location_click_to_get">📍 클릭하여 위치 가져오기</string>
+    <string name="error_no_location_publish">위치를 가져오지 못했습니다. 상단 버튼을 클릭하세요!</string>
+    <string name="error_empty_contact_publish">연락처 ID를 입력하세요!</string>
+    <string name="error_empty_description_publish">설명을 입력하세요!</string>
+    <string name="msg_publish_success_default">발행 성공! 좋은 하루 되세요!</string>
+    <string name="btn_clear_draft">🗑️ 초안 삭제</string>
+    <string name="dialog_clear_draft_title">초안 삭제</string>
+    <string name="dialog_clear_draft_msg">현재 입력된 모든 내용을 삭제하고 다시 작성하시겠습니까?</string>
+    <string name="msg_draft_cleared">초안이 삭제되었습니다</string>
+    <string name="welcome_prefix">환영합니다 </string>
+    <string name="btn_disagree_exit">거부 및 종료</string>
+    <string name="terms_checkbox_text">《서비스 이용약관》 및 《개인정보 처리방침》을 읽었으며 이에 동의합니다</string>
+    <string name="terms_service_label">서비스 이용약관</string>
+    <string name="privacy_policy_label">개인정보 처리방침</string>
+    <string name="btn_agree_continue">동의 및 계속하기</string>
+    <string name="error_must_agree_terms">먼저 이용약관 및 개인정보 처리방침을 읽고 동의해 주세요</string>
+    <string name="dialog_terms_title">이용약관 및 개인정보 처리방침</string>
+    <string name="terms_content_full">【서비스 이용약관 및 개인정보 처리방침 요약】\n\n본 플랫폼을 이용해 주셔서 감사합니다! 귀하의 권익 보호를 위해 가입/로그인 전 다음 내용을 주의 깊게 읽어주시기 바랍니다:\n\n1. 개인정보 수집 및 위치 서비스:\n   본 플랫폼은 지역 수요와 공급 매칭을 위해 권한 획득 후 실시간 GPS 위치 및 연락처 정보(LINE ID, 전화번호 등)를 수집하며, 이는 게시 및 매칭 목적으로만 사용됩니다.\n\n2. 정보 게시 및 책임:\n   사용자가 게시하는 수요, 공급, 이미지 및 링크는 진실되고 합법적이어야 합니다. 사기, 금지 품목, 불법 서비스와 관련된 내용은 즉시 계정 차단 및 법적 조치의 대상이 될 수 있습니다.\n\n3. 플랫폼 면책 조항:\n   본 플랫폼은 정보 중개 채널만 제공합니다. 사용자 간의 개인 거래, 서비스 이행 및 결제 행위는 양사자가 직접 확인하고 평가해야 하며, 플랫폼은 공식 보증되지 않은 거래 손실에 대해 책임을 지지 않습니다.\n\n4. 연락처 정보 공개 동의:\n   수요 또는 공급을 게시할 때, 귀하가 작성한 연락처(LINE ID, KakaoTalk 등)가 매칭된 사용자에게 공개되는 것에 동의하는 것으로 간주합니다.</string>
+    <string name="consent_title">환영합니다</string>
+    <string name="consent_terms">서비스 이용약관 및 개인정보 처리방침에 동의합니다</string>
+    <string name="consent_gps">주변 12시간 수요를 검색하기 위해 GPS 위치 권한을 허용합니다</string>
+    <string name="btn_disagree">동의하지 않음</string>
+    <string name="btn_agree">동의하고 시작하기</string>
+    <string name="gps_denied_msg">주변 서비스를 확인하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해 주세요.</string>
+    <string name="btn_go_to_settings">설정으로 이동</string>
+    <string name="msg_max_length_reached">최대 글자 수(120자)에 도달했습니다</string>
+    <string name="btn_more">(더보기)</string>
+    <string name="btn_less">(접기)</string>
+    <string name="platform_phone">전화번호</string>
+</resources>

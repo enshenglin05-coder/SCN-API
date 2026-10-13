@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayoutUI3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- ViewPager2 用於全頁卡片 Snap 滑動流 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerUI3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+
+    <!-- 頂部懸浮吸頂列 (Sticky Header) -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/cvStickyGeminiHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</FrameLayout>

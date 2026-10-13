@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 128 色流光邊框裝飾層 -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/cvBorderViewport"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="42dp">
+
+        <LinearLayout
+            android:id="@+id/requirementItemContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:background="@android:color/transparent">
+
+            <!-- 1. 【頂部固定區 (Top Header Area)】 - 嚴格垂直解耦三層結構 -->
+            <LinearLayout
+                android:id="@+id/layout_card_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="0dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
+                android:elevation="10dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <!-- 第 1 排 (最頂端): 按鈕兩端對齊 (Flex Space-Between) -->
+                <LinearLayout
+                    android:id="@+id/layout_header_row1_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <!-- 左側：一鍵打包 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/cv_header_pack_border"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_header_pack"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            app:backgroundTint="@null"
+                            android:text="📋 一鍵打包"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:padding="0dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp" />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="0dp" />
+
+                    <!-- 右側：AI 發布 -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1">
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/cv_header_ai_border"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_header_ai"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            app:backgroundTint="@null"
+                            android:text="🚀 AI 發布"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:padding="0dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 第 2 排: 分類標籤與互動數據 -->
+                <LinearLayout
+                    android:id="@+id/layout_header_row2_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <!-- 左側：分類標籤 -->
+                    <TextView
+                        android:id="@+id/tv_card_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:maxWidth="130dp"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:background="@drawable/bg_capsule_button"
+                        android:textColor="#4285F4"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="6dp"
+                        android:text="在地攤商" />
+
+                    <!-- 右側：互動數據 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginStart="8dp">
+                        <LinearLayout
+                            android:id="@+id/btn_like_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="4dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👍" android:textSize="15sp" />
+                            <TextView android:id="@+id/tv_like_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="12sp" android:layout_marginStart="2dp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/btn_dislike_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="4dp"
+                            android:layout_marginStart="6dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👎" android:textSize="15sp" />
+                            <TextView android:id="@+id/tv_dislike_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="12sp" android:layout_marginStart="2dp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/layout_report_area"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="4dp"
+                            android:layout_marginStart="6dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🚨" android:textSize="15sp" />
+                            <TextView android:id="@+id/tv_report_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:alpha="0.8" android:textSize="10sp" android:layout_marginStart="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 基本資訊顯示 -->
+            <TextView
+                android:id="@+id/tv_publish_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#AAAAAA"
+                android:textSize="13sp"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/tv_location_coords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#DDDDDD"
+                android:textSize="13sp"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/tv_location_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="2dp"
+                android:layout_gravity="center_horizontal"
+                android:text="查看發布者大概位置，請點擊地圖查看"
+                android:textColor="#FFF59D"
+                android:textSize="11sp"
+                android:alpha="0.9" />
+
+            <!-- Google Map 導航按鈕 -->
+            <FrameLayout
+                android:id="@+id/fl_google_maps"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center">
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/cv_google_maps_border"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_google_maps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    app:backgroundTint="@null"
+                    android:textColor="#FFCC00"
+                    android:text="@string/card_btn_map"
+                    android:paddingHorizontal="24dp"
+                    android:textSize="13sp"
+                    app:cornerRadius="18dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
+            </FrameLayout>
+
+            <!-- 2. 【中部自適應區 (Middle Content Area)】 -->
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/cv_description_compose"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/bg_frosted_fill" />
+
+            <!-- 彈性推擠空間 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- 3. 【底部動作區 (Bottom Actions Area)】 - 置中且垂直堆疊修正 -->
+            <LinearLayout
+                android:id="@+id/layout_card_footer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="12dp">
+
+                <!-- 個人/產品介紹 -->
+                <FrameLayout
+                    android:id="@+id/fl_external_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_gravity="center_horizontal">
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/cv_external_link_border"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_external_link"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        app:backgroundTint="@null"
+                        android:textColor="#00FFFF"
+                        android:text="@string/card_btn_ext"
+                        android:padding="0dp"
+                        android:textSize="14sp"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="0dp" />
+                </FrameLayout>
+
+                <!-- 聯絡對接 -->
+                <FrameLayout
+                    android:id="@+id/fl_contact_action"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_gravity="center_horizontal">
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/cv_contact_border"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_contact_action"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        app:backgroundTint="@null"
+                        android:textColor="#06C755"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="💬 聯絡對接"
+                        app:cornerRadius="24dp"
+                        app:strokeWidth="0dp" />
+                </FrameLayout>
+
+                <!-- 電話撥打 -->
+                <FrameLayout
+                    android:id="@+id/fl_phone_action"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:visibility="gone"
+                    android:layout_gravity="center_horizontal">
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/cv_phone_border"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_phone_action"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        app:backgroundTint="@null"
+                        android:textColor="#4285F4"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="📞 撥打電話"
+                        app:cornerRadius="24dp"
+                        app:strokeWidth="0dp" />
+                </FrameLayout>
+
+                <!-- 下架按鈕 -->
+                <FrameLayout
+                    android:id="@+id/fl_delete_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_gravity="center_horizontal">
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/cv_delete_border"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_delete_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        app:backgroundTint="@null"
+                        android:textColor="#D32F2F"
+                        android:text="@string/btn_delete_card_text"
+                        android:padding="0dp"
+                        android:textSize="14sp"
+                        app:cornerRadius="20dp"
+                        app:strokeWidth="0dp" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tv_card_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#888888"
+                    android:textSize="11sp"
+                    android:text="ID: 1A-00000000" />
+
+                <!-- 最終引導提示 -->
+                <TextView
+                    android:id="@+id/tv_swipe_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center_horizontal"
+                    android:text="↑ 向上滑動可查看更多列表"
+                    android:textColor="#00FFC2"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:shadowColor="#8000FFC2"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="6" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

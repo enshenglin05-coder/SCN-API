@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="0dp"
+    android:layout_marginBottom="4dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <!-- 頂部外部標籤 (第一排使用) -->
+    <TextView
+        android:id="@+id/tvSubBadgeTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:textColor="#8899A6"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="1-1"
+        tools:visibility="visible" />
+
+    <!-- 豆腐塊主體 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/blockContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="64dp"
+            android:background="@drawable/bg_sub_category_capsule"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp"
+            android:gravity="center"
+            android:clipToOutline="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvSubCategoryName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:maxLines="2"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="0.9"
+                android:ellipsize="none"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="攤商 / 個體戶" />
+        </LinearLayout>
+
+        <!-- 流光邊框層 -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/subCatRainbowBorder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <!-- 底部外部標籤 (第二排使用) -->
+    <TextView
+        android:id="@+id/tvSubBadgeBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#8899A6"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="1-2" />
+
+</LinearLayout>

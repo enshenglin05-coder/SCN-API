@@ -1,0 +1,345 @@
+<resources>
+    <string name="app_name">百川</string>
+    <string name="ui2_title">項目選擇介面 (食衣住行育樂)</string>
+    <string name="selection_status_prefix">目前選取：</string>
+    <string name="none_selected">未選擇</string>
+    <string name="cat_food">食</string>
+    <string name="cat_clothing">衣</string>
+    <string name="cat_housing">住</string>
+    <string name="cat_transport">行</string>
+    <string name="cat_education">育</string>
+    <string name="cat_entertainment">樂</string>
+    <string name="cat_medical">醫</string>
+    <string name="cat_secondhand">二</string>
+    <string name="cat_pet">寵</string>
+    <string name="cat_service">務</string>
+
+    <string name="cat_1_food">1. 食（餐飲美食）</string>
+    <string name="cat_2_clothing">2. 衣/物 (生活百貨)</string>
+    <string name="cat_3_housing">3. 住/行 (跑腿修繕)</string>
+    <string name="cat_4_transport">4. 交通出行</string>
+    <string name="cat_5_education">5. 教育學習</string>
+    <string name="cat_6_entertainment">6. 休閒娛樂</string>
+    <string name="cat_7_medical">7. 醫療保健</string>
+    <string name="cat_8_secondhand">8. 二手交換</string>
+    <string name="cat_9_pet">9. 寵物服務</string>
+    <string name="cat_10_service">10. 專業服務</string>
+    <string name="cat_11_reserved">11. 公益關懷</string>
+
+    <!-- 子項目資源 ID 化 -->
+    <string name="sub_item_1_1">在地攤商\n個人私廚</string>
+    <string name="sub_item_1_2">在地小吃\n便當快餐</string>
+    <string name="sub_item_1_3">火鍋燒肉\n牛排鐵板</string>
+    <string name="sub_item_1_4">熱炒合菜\n中式餐廳</string>
+    <string name="sub_item_1_5">異國料理\n日韓泰法</string>
+    <string name="sub_item_1_6">早午輕食\n咖啡甜點</string>
+    <string name="sub_item_1_7">手搖飲料\n冰品甜湯</string>
+    <string name="sub_item_1_8">宵夜炸物\n酒吧滷味</string>
+
+    <string name="sub_item_2_1">潮流服飾</string>
+    <string name="sub_item_2_2">鞋類精品</string>
+    <string name="sub_item_2_3">飾品配件</string>
+    <string name="sub_item_2_4">運動戶外</string>
+    <string name="sub_item_2_5">內衣睡衣</string>
+    <string name="sub_item_2_6">童裝孕婦</string>
+    <string name="sub_item_2_7">洗滌二手</string>
+    <string name="sub_item_2_8">綜合其它</string>
+
+    <string name="sub_item_3_1">租屋資訊</string>
+    <string name="sub_item_3_2">房產買賣</string>
+    <string name="sub_item_3_3">裝潢修繕</string>
+    <string name="sub_item_3_4">水電鎖印</string>
+    <string name="sub_item_3_5">清潔家政</string>
+    <string name="sub_item_3_6">家具家電</string>
+    <string name="sub_item_3_7">搬家儲藏</string>
+    <string name="sub_item_3_8">綜合其它</string>
+
+    <string name="sub_item_4_1">機車跑腿\n急件順風</string>
+    <string name="sub_item_4_2">計程叫車\n長照接送</string>
+    <string name="sub_item_4_3">貨車搬運\n載貨接單</string>
+    <string name="sub_item_4_4">機車維修\n保養洗車</string>
+    <string name="sub_item_4_5">汽車修護\n美容輪胎</string>
+    <string name="sub_item_4_6">拖吊救援\n代駕服務</string>
+    <string name="sub_item_4_7">租車服務\n共享出行</string>
+    <string name="sub_item_4_8">綜合其它\n出行站點</string>
+
+    <string name="sub_item_5_1">幼兒托育\n保母家教</string>
+    <string name="sub_item_5_2">補習輔導\n升學檢定</string>
+    <string name="sub_item_5_3">才藝培訓\n音樂美術</string>
+    <string name="sub_item_5_4">運動健身\n私人教練</string>
+    <string name="sub_item_5_5">語言學習\n留學檢定</string>
+    <string name="sub_item_5_6">職業技能\n證照培訓</string>
+    <string name="sub_item_5_7">駕訓考照\n汽機車班</string>
+    <string name="sub_item_5_8">綜合其它\n學習資訊</string>
+
+    <string name="sub_item_6_1">KTV 視聽\n酒吧夜生活</string>
+    <string name="sub_item_6_2">按摩 SPA\n美容美體</string>
+    <string name="sub_item_6_3">影城劇院\n展覽演出</string>
+    <string name="sub_item_6_4">網咖電競\n桌遊密室</string>
+    <string name="sub_item_6_5">親子樂園\n戶外休閒</string>
+    <string name="sub_item_6_6">運動場館\n保齡球館</string>
+    <string name="sub_item_6_7">美甲美睫\n美髮理容</string>
+    <string name="sub_item_6_8">綜合其它\n休閒票券</string>
+
+    <string name="sub_item_7_1">藥局藥品\n保健送藥</string>
+    <string name="sub_item_7_2">診所門診\n掛號諮詢</string>
+    <string name="sub_item_7_3">看護照顧\n居家照護</string>
+    <string name="sub_item_7_4">醫美整形\n皮膚管理</string>
+    <string name="sub_item_7_5">健檢中心\n醫事檢驗</string>
+    <string name="sub_item_7_6">復健物理\n中醫針灸</string>
+    <string name="sub_item_7_7">輔具租售\n醫療器材</string>
+    <string name="sub_item_7_8">綜合其它\n健康諮詢</string>
+
+    <string name="sub_item_8_1">二手手機\n數碼 3C</string>
+    <string name="sub_item_8_2">汽機買賣\n二輪四輪</string>
+    <string name="sub_item_8_3">家電傢俱\n居家閒置</string>
+    <string name="sub_item_8_4">精品服飾\n包款古著</string>
+    <string name="sub_item_8_5">母嬰用品\n玩具童車</string>
+    <string name="sub_item_8_6">遊戲電玩\n動漫周邊</string>
+    <string name="sub_item_8_7">戶外裝備\n運動器材</string>
+    <string name="sub_item_8_8">綜合閒置\n在地面交</string>
+
+    <string name="sub_item_9_1">寵物洗澡\n美容造型</string>
+    <string name="sub_item_9_2">寵物寄養\n日託安親</string>
+    <string name="sub_item_9_3">獸醫門診\n急診疫苗</string>
+    <string name="sub_item_9_4">寵物接送\n專車跑腿</string>
+    <string name="sub_item_9_5">到府餵食\n代遛寵物</string>
+    <string name="sub_item_9_6">寵物用品\n主糧零食</string>
+    <string name="sub_item_9_7">走失協尋\n送養領養</string>
+    <string name="sub_item_9_8">綜合其它\n寵物生命</string>
+
+    <string name="sub_item_10_1">臨時短工\n活動人力</string>
+    <string name="sub_item_10_2">家事清潔\n消毒除蟲</string>
+    <string name="sub_item_10_3">專業修繕\n裝潢水電</string>
+    <string name="sub_item_10_4">代辦跑腿\n現場排隊</string>
+    <string name="sub_item_10_5">活動企劃\n攝影主持</string>
+    <string name="sub_item_10_6">專業諮詢\n代寫翻譯</string>
+    <string name="sub_item_10_7">緊急求助\n在地互助</string>
+    <string name="sub_item_10_8">綜合服務\n其它幫忙</string>
+
+    <!-- zh-TW 在地信仰 -->
+    <string name="card_tw_landlord_name">土地公 (福德正神)</string>
+    <string name="card_tw_landlord_desc">土地公 福德正神保佑您，祝您財源廣進、生意興隆！</string>
+    <string name="card_tw_mazu_name">媽祖 (天上聖母)</string>
+    <string name="card_tw_mazu_desc">媽祖 天上聖母保佑您，祝您出入平安、順風順水！</string>
+    <string name="card_tw_christian_name">基督教祈福</string>
+    <string name="card_tw_christian_desc">上帝祝福你，願主與你同在，平安喜樂！</string>
+    <string name="card_tw_buddhist_name">佛教禪修</string>
+    <string name="card_tw_buddhist_desc">願你平安喜樂，福慧增長，諸事順心！</string>
+    <string name="card_tw_none_name">心靈平靜</string>
+    <string name="card_tw_none_desc">祝您今天心情愉快，生活順心，一切順利！</string>
+
+    <!-- ja 在地信仰 -->
+    <string name="card_ja_shinto_name">神社・神道 祈願</string>
+    <string name="card_ja_shinto_desc">神々のご加護により、無病息災と心願成就をお祈りいたします。</string>
+    <string name="card_ja_buddhist_name">仏教・心願成就</string>
+    <string name="card_ja_buddhist_desc">心身の安寧と、平穏な毎日をお過ごしください。</string>
+    <string name="card_ja_christian_name">キリスト教 祝福</string>
+    <string name="card_ja_christian_desc">主の恵みと祝福があなたとともにありますように。</string>
+    <string name="card_ja_none_name">心の平安</string>
+    <string name="card_ja_none_desc">あなたの毎日に幸せと平和が訪れますように。</string>
+
+    <!-- ko 在地信仰 -->
+    <string name="card_ko_christian_name">개신교 축복</string>
+    <string name="card_ko_christian_desc">주님의 축복과 평화가 함께하길 기員합니다.</string>
+    <string name="card_ko_buddhist_name">불교 자비</string>
+    <string name="card_ko_buddhist_desc">부처님의 자비로 평안과 행복이 가득하길 바랍니다.</string>
+    <string name="card_ko_catholic_name">천주교 은혜</string>
+    <string name="card_ko_catholic_desc">주님의 은혜 안에 늘 평화롭기를 빕니다.</string>
+    <string name="card_ko_none_name">행복한 하루</string>
+    <string name="card_ko_none_desc">늘 건강하시고 행복한 하루가 되시길 바랍니다.</string>
+
+    <!-- vi 在地信仰 -->
+    <string name="card_vi_buddhist_name">Phật giáo Bình an</string>
+    <string name="card_vi_buddhist_desc">Cầu mong Phật Bồ Tát ban phước lành và bình an cho bạn.</string>
+    <string name="card_vi_christian_name">Công giáo Chúc lành</string>
+    <string name="card_vi_christian_desc">Chúa chúc lành và luôn ở cùng bạn.</string>
+    <string name="card_vi_caodai_name">Đạo Cao Đài</string>
+    <string name="card_vi_caodai_desc">Cầu mong vạn sự tốt lành và may mắn đến với bạn.</string>
+    <string name="card_vi_none_name">Một ngày thuận lợi</string>
+    <string name="card_vi_none_desc">Chúc bạn một ngày luôn hạnh phúc and mọi sự thuận lợi.</string>
+
+    <!-- 區域原生宗教 -->
+    <string name="religion_tw_tudigong_title">土地公 (福德正神)</string>
+    <string name="religion_tw_tudigong_desc">土地公 福德正神保佑您，祝您財源廣進、生意興隆！</string>
+    <string name="religion_tw_mazu_title">天上聖母 (媽祖)</string>
+    <string name="religion_tw_mazu_desc">媽祖 天上聖母保佑您，祝您出入平安、順風順水！</string>
+    <string name="religion_tw_guangong_title">關聖帝君 (關公)</string>
+    <string name="religion_tw_guangong_desc">關聖帝君保佑您，祝您事業順利、小人退散！</string>
+    <string name="religion_tw_christian_title">基督教 (願主保佑)</string>
+    <string name="religion_tw_christian_desc">願主耶穌基督的恩惠、上帝的慈愛與您同在。</string>
+    <string name="religion_tw_buddhist_title">佛教 (佛光普照)</string>
+    <string name="religion_tw_buddhist_desc">佛光普照，願您增長智慧、福慧雙修、平安喜樂。</string>
+    <string name="religion_tw_general_title">心靈祝福 (通用)</string>
+    <string name="religion_tw_general_desc">願美好的祝福陪伴著您，心想事成、萬事順心！</string>
+
+    <string name="religion_en_christian_title">Christianity</string>
+    <string name="religion_en_christian_desc">May God bless you.</string>
+    <string name="religion_en_catholic_title">Catholicism</string>
+    <string name="religion_en_catholic_desc">May the peace of the Lord be with you.</string>
+    <string name="religion_en_judaism_title">Judaism</string>
+    <string name="religion_en_judaism_desc">May the Almighty guide you.</string>
+    <string name="religion_en_islam_title">Islam</string>
+    <string name="religion_en_islam_desc">May Allah grant you health.</string>
+    <string name="religion_en_general_title">Secular Mindfulness</string>
+    <string name="religion_en_general_desc">May peace be with you.</string>
+
+    <string name="religion_ja_shinto_title">Shinto</string>
+    <string name="religion_ja_shinto_desc">Gokago o.</string>
+    <string name="religion_ja_buddhist_title">Buddhism</string>
+    <string name="religion_ja_buddhist_desc">Annei o.</string>
+    <string name="religion_ja_christian_title">Christianity</string>
+    <string name="religion_ja_christian_desc">Megumi o.</string>
+    <string name="religion_ja_general_title">General</string>
+    <string name="religion_ja_general_desc">Heiva o.</string>
+
+    <string name="religion_ko_protestant_title">Protestant</string>
+    <string name="religion_ko_protestant_desc">Blessings.</string>
+    <string name="religion_ko_catholic_title">Catholic</string>
+    <string name="religion_ko_catholic_desc">Grace.</string>
+    <string name="religion_ko_buddhist_title">Buddhism</string>
+    <string name="religion_ko_buddhist_desc">Mercy.</string>
+    <string name="religion_ko_general_title">General</string>
+    <string name="religion_ko_general_desc">Peace.</string>
+
+    <string name="religion_vi_buddhist_title">Buddhism</string>
+    <string name="religion_vi_buddhist_desc">Binh an.</string>
+    <string name="religion_vi_catholic_title">Catholicism</string>
+    <string name="religion_vi_catholic_desc">Chuc lanh.</string>
+    <string name="religion_vi_caodai_title">Cao Dai</string>
+    <string name="religion_vi_caodai_desc">May man.</string>
+    <string name="religion_vi_general_title">General</string>
+    <string name="religion_vi_general_desc">Hanh phuc.</string>
+
+    <string name="ui1_hint">請選擇心靈祝福 / 信仰類別 (必選)：</string>
+    <string name="btn_enter_ui2">確認選擇</string>
+    <string name="exit">退出</string>
+    <string name="label_rainbow_switch">開啟流彩氛圍燈</string>
+    <string name="error_select_card">請先選擇心靈祝福 / 信仰類別！</string>
+    <string name="distance_setting_prefix">距離設定：</string>
+    <string name="km_unit">KM</string>
+    <string name="dialog_distance_title">設定搜尋距離 (KM)</string>
+    <string name="confirm">確定</string>
+    <string name="cancel">取消</string>
+    <string name="switch_ai_label">百川 AI</string>
+
+    <!-- UI3 資源 -->
+    <string name="btn_location_acquired">📍 已取得位置</string>
+    <string name="btn_location_click_to_get">📍 點擊獲取位置</string>
+    <string name="tab_need">我要需求</string>
+    <string name="tab_supply">我要供給</string>
+    <string name="hint_description">請輸入詳細需求或服務說明...</string>
+    <string name="label_social_link_hint">請仔細輸入產品網址說明與照片提供說明 (FB/YouTube/抖音/X/Threads 等皆可自行張貼，非必填)</string>
+    <string name="hint_social_merged">🔗 自行張貼說明網址 (FB/YT/TikTok/X...)</string>
+    <string name="hint_contact_id_specific">請輸入選定通訊軟體之 ID / 帳號</string>
+    <string name="hint_phone_number">📞 請輸入聯絡電話號碼 (點擊可直撥)</string>
+    <string name="btn_clear_draft">🗑️ 清空草稿</string>
+    <string name="btn_save_draft">💾 暫存草稿</string>
+    <string name="btn_refresh_list">🔄 刷新列表</string>
+    <string name="btn_publish_text">✨ 立即發布</string>
+    <string name="label_scroll_down_hint_need">↑ 向上滑動可查看提供者服務卡片列表</string>
+    <string name="label_scroll_down_hint_supply">↑ 向上滑動可查看需求者需求卡片列表</string>
+
+    <string name="btn_get_gps">取得當前 GPS 定位</string>
+    <string name="label_gps_coords">[緯度: %1$s, 經度: %2$s]</string>
+    <string name="msg_draft_saved">草稿已暫存</string>
+    <string name="platform_phone">Phone</string>
+    <string name="platform_telegram">Telegram</string>
+    <string name="label_social_hint">📌 相關照片社群說明網址</string>
+    <string name="label_publish_hint">📌 發布條件說明欄位</string>
+    <string name="label_contact_method">通訊方式選擇：</string>
+    <string name="hint_contact_id">請輸入通訊帳號</string>
+    <string name="btn_publishing">發佈中...</string>
+    <string name="title_nearby_list">附近的需求與供給列表</string>
+    <string name="platform_line">LINE ID</string>
+    <string name="platform_kakao">KakaoTalk</string>
+    <string name="platform_wechat">WeChat</string>
+    <string name="platform_whatsapp">WhatsApp / Zalo</string>
+
+    <string name="error_permission_location">需要定位權限以發布需求</string>
+    <string name="msg_location_success">實機定位成功</string>
+    <string name="error_location_failed">無法取得定位，請確認 GPS 是否開啟</string>
+    <string name="error_location_error">定位失敗: %s</string>
+    <string name="error_empty_description">請輸入需求說明</string>
+    <string name="error_no_location">請先取得 GPS 定位</string>
+    <string name="error_empty_contact">請輸入通訊帳號</string>
+    <string name="msg_publish_success">發佈成功！</string>
+    <string name="msg_unpublish_success">已下架該項目</string>
+    <string name="msg_report_success">已收到檢舉，感謝您的回報</string>
+    <string name="error_open_link">無法開啟連結</string>
+    <string name="error_line_jump">無法跳轉 LINE，已複製帳號</string>
+    <string name="msg_wechat_copy">已複製微信 ID，即將開啟微信</string>
+    <string name="msg_kakao_copy">已複製 Kakao ID，即將開啟 App</string>
+    <string name="msg_whatsapp_copy">已複製 WhatsApp 帳號</string>
+    <string name="label_publish_success_countdown">發佈成功 (%ds)</string>
+
+    <!-- Adapter 資源 -->
+    <string name="tag_need">需求</string>
+    <string name="tag_supply">供給</string>
+    <string name="label_remaining_time">剩餘 %1$dh %2$dm</string>
+    <string name="label_distance">📍 %s km</string>
+    <string name="label_distance_unknown">📍 距離未知</string>
+    <string name="btn_view_social">🔗 查看照片 / 社群 / 說明網址</string>
+    <string name="btn_contact_prefix">💬 聯絡對接</string>
+    <string name="label_desc_prefix">說明：</string>
+    <string name="label_location_prefix">位置：</string>
+    <string name="label_publish_time_prefix">發布時間：</string>
+    <string name="menu_report_card">檢舉此卡片</string>
+    <string name="btn_delete_card_text">✕ 下架 / 全網刪除 (Off-shelf)</string>
+    <string name="btn_google_maps_text">🗺️ Google Maps 導航</string>
+
+    <!-- 舉報對話框資源 -->
+    <string name="report_title">檢舉違規內容</string>
+    <string name="label_report">檢舉</string>
+    <string name="report_opt_1">詐騙、詐欺或不實資訊</string>
+    <string name="report_opt_2">色情或成人內容</string>
+    <string name="report_opt_3">暴力、仇恨或騷擾內容</string>
+    <string name="report_opt_4">販售或推廣管制商品</string>
+    <string name="report_opt_5">其他違規事項</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_submit">提交檢舉</string>
+    <string name="report_msg_success">已收到您的檢舉</string>
+
+    <string name="error_refresh_no_gps">請先點擊『📍點擊獲取位置』，以搜尋附近 6 KM 的有用資料</string>
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
+    <!-- Card Compact Strings -->
+    <string name="card_lbl_dist">距離</string>
+    <string name="card_unit_km">km</string>
+    <string name="card_lbl_time">發布於</string>
+    <string name="card_unit_min">分鐘前</string>
+    <string name="card_lbl_like">讚</string>
+    <string name="card_btn_more">詳情</string>
+    <string name="card_btn_map">Google Map 導航</string>
+    <string name="card_btn_ext">個人 / 產品介紹</string>
+
+    <!-- 發布頁面邏輯資源 -->
+    <string name="error_no_location_publish">未獲取位置，請先點擊上方『我的位置』按鈕！</string>
+    <string name="error_empty_contact_publish">請輸入通訊帳號，以便附近使用者聯繫！</string>
+    <string name="error_empty_description_publish">請輸入需求或服務說明內容！</string>
+    <string name="msg_publish_success_default">發布成功，祝您順心！</string>
+    <string name="dialog_clear_draft_title">清除草稿</string>
+    <string name="dialog_clear_draft_msg">確定要清除目前填寫的所有內容並重填嗎？</string>
+    <string name="msg_draft_cleared">草稿已清除</string>
+    <string name="welcome_prefix">歡迎使用 </string>
+    <string name="btn_disagree_exit">不同意並退出</string>
+    <string name="terms_checkbox_text">我已閱讀並同意 《服務條款》 與 《隱私權政策》</string>
+    <string name="terms_service_label">服務條款</string>
+    <string name="privacy_policy_label">隱私權政策</string>
+    <string name="btn_agree_continue">同意並繼續</string>
+    <string name="error_must_agree_terms">請先閱讀並勾選同意服務條款與隱私權政策</string>
+    <string name="dialog_terms_title">服務條款與隱私權政策</string>
+    <string name="terms_content_full">【服務條款與隱私權政策摘要說明】\n\n歡迎使用本平台！為保障您的權益，請在註冊/登錄前仔細閱讀以下內容：\n\n1. 個人資料收集與定位服務：\n   本平台為提供在地需求與供給匹配，將在獲取您授權後取得您的即時地理位置（GPS）與通訊聯絡資訊（如 LINE ID、電話等），僅用於完成發布與派單對接。\n\n2. 資訊發布與自負責任：\n   使用者於本平台發布之需求、供給、圖片及社群連結，須確保真實合法。任何涉及詐欺、違禁品、非法服務之內容，平台有權立即封鎖帳號並移送法辦。\n\n3. 平台免責聲明：\n   本平台僅提供資訊撮合與媒合管道，使用者與車手、服務提供者之間之私下交易、服務履約及付款行為，請雙方自行核對評估，平台不承擔非平台官方擔保之交易損失。\n\n4. 通訊資訊公開同意：\n   當您發布需求或供給時，即表示您同意將您所填寫之聯絡方式（如 LINE ID, KakaoTalk 等）展示給匹配之使用者以進行對接。</string>
+    <string name="consent_title">歡迎使用</string>
+    <string name="consent_terms">我已閱讀並同意《服務條款》與《隱私權政策》</string>
+    <string name="consent_gps">授權 GPS 定位權限以搜尋周圍 12 小時需求</string>
+    <string name="btn_disagree">不同意</string>
+    <string name="btn_agree">同意並繼續</string>
+    <string name="gps_denied_msg">本 App 需取得定位權限以在地圖上提供服務，請至設定中開啟權限。</string>
+    <string name="btn_go_to_settings">前往設定</string>
+    <string name="msg_max_length_reached">已達最大字數限制 (120字)</string>
+    <string name="btn_more">(展開)</string>
+    <string name="btn_less">(收起)</string>
+    <string name="msg_tts_list_updated">已更新周邊卡片列表</string>
+    <string name="msg_tts_publish_success">卡片已成功發布</string>
+    <string name="msg_tts_fill_required">請填寫必要說明與聯絡方式</string>
+</resources>

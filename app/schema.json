@@ -1,0 +1,27 @@
+{
+  "project": "Baichuan",
+  "version": "1.0",
+  "data_rules": {
+    "ttl_hours": 12,
+    "max_bounding_box_km": 50.0,
+    "report_block_threshold": 3,
+    "matching_logic": {
+      "demand_token": "1A",
+      "supply_token": "1B",
+      "alignment": "CROSS_DIRECTIONAL"
+    }
+  },
+  "category_mapping": {
+    "food": "1",
+    "clothing": "2",
+    "housing": "3",
+    "transport": "4",
+    "education": "5",
+    "entertainment": "6",
+    "medical": "7",
+    "secondhand": "8",
+    "pet": "9",
+    "service": "10",
+    "reserved": "11"
+  }
+}
