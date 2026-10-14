@@ -39,39 +39,55 @@ object BaichuanApiService {
         .writeTimeout(20, TimeUnit.SECONDS)
         .addInterceptor { chain ->
             val originalRequest = chain.request()
+            val urlString = originalRequest.url.toString()
 
-            // 1. 確保在所有發布與資料同步的 API 請求 Header 中，自動帶入正確且有效的 Token（Authorization）
-            val authHeader = getAuthHeader()
             val requestBuilder = originalRequest.newBuilder()
                 .header(HEADER_ACCEPT, VALUE_ACCEPT)
                 .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
+                .header("X-GitHub-Api-Version", "2022-11-28")
 
-            if (authHeader.isNotBlank()) {
-                requestBuilder.header(HEADER_AUTH, authHeader)
+            // 【深度盤查修復】只有向 api.github.com 發送寫入/管理請求時才帶入 Authorization Bearer Token
+            // 絕對不能向 raw.githubusercontent.com (GitHub CDN 靜態站點) 帶入 Authorization，否則 GitHub CDN 會回傳 401 Unauthorized
+            if (urlString.contains("api.github.com")) {
+                val authHeader = getAuthHeader()
+                if (authHeader.isNotBlank()) {
+                    requestBuilder.header(HEADER_AUTH, authHeader)
+                    android.util.Log.d("BaichuanAPI", "🔒 已為 API 請求注入授權標頭: $urlString")
+                }
+            } else {
+                android.util.Log.d("BaichuanAPI", "🌐 略過授權標頭 (公開 CDN/Raw 請求): $urlString")
             }
 
-            var response = chain.proceed(requestBuilder.build())
+            val builtRequest = requestBuilder.build()
+            android.util.Log.d("BaichuanAPI", "🚀 發送 HTTP 請求 | Method: ${builtRequest.method} | URL: ${builtRequest.url}")
+            android.util.Log.d("BaichuanAPI", "📋 請求 Headers: ${builtRequest.headers}")
 
-            // 2. 攔截 401 Unauthorized 或 403 Forbidden 情況，嘗試自動刷新 Token 並重試
+            var response = chain.proceed(builtRequest)
+            android.util.Log.d("BaichuanAPI", "📥 收到 HTTP 回應 | URL: ${response.request.url} | 狀態碼: HTTP ${response.code}")
+
             if (response.code == 401 || response.code == 403) {
-                android.util.Log.e("BaichuanAPI", "⚠️ API 響應 HTTP ${response.code} (Unauthorized / Token 無效)，嘗試自動重新獲取...")
+                android.util.Log.e("BaichuanAPI", "⚠️ API 響應 HTTP ${response.code} (Unauthorized / Token 無效)，請求網址: ${response.request.url}")
 
-                // 嘗試刷新 Token
-                val refreshed = UserIdentityManager.refreshAuthToken(appContext)
-                if (refreshed) {
-                    val newAuthHeader = getAuthHeader()
-                    if (newAuthHeader.isNotBlank()) {
-                        response.close() // 關閉先前的 401 Response
-                        val retryRequest = originalRequest.newBuilder()
-                            .header(HEADER_AUTH, newAuthHeader)
-                            .header(HEADER_ACCEPT, VALUE_ACCEPT)
-                            .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
-                            .build()
-                        response = chain.proceed(retryRequest)
+                // 若為 api.github.com 且帶有 Token 失敗，嘗試重新整理並重試一次
+                if (urlString.contains("api.github.com")) {
+                    val refreshed = UserIdentityManager.refreshAuthToken(appContext)
+                    if (refreshed) {
+                        val newAuthHeader = getAuthHeader()
+                        if (newAuthHeader.isNotBlank()) {
+                            response.close()
+                            val retryRequest = originalRequest.newBuilder()
+                                .header(HEADER_AUTH, newAuthHeader)
+                                .header(HEADER_ACCEPT, VALUE_ACCEPT)
+                                .header(HEADER_USER_AGENT, VALUE_USER_AGENT)
+                                .header("X-GitHub-Api-Version", "2022-11-28")
+                                .build()
+                            android.util.Log.d("BaichuanAPI", "🔄 正在使用新 Token 重試請求: ${retryRequest.url}")
+                            response = chain.proceed(retryRequest)
+                            android.util.Log.d("BaichuanAPI", "📥 重試後回應狀態碼: HTTP ${response.code}")
+                        }
                     }
                 }
 
-                // 若重試後依然為 401/403，安全提示錯誤，絕對不強制將使用者踢回條款同意頁面
                 if (response.code == 401 || response.code == 403) {
                     handleUnauthorizedError()
                 }
