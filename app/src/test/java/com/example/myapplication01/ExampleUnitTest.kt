@@ -408,4 +408,31 @@ class ExampleUnitTest {
         assertEquals(1, filtered.size)
         assertEquals("TEST_CALLBACK_01", filtered.first().card_id)
     }
+
+    @Test
+    fun testGrid88FormatterAndABCrossLogic() {
+        val allGrids = Grid88Formatter.getAllGridCodes()
+        assertEquals(88, allGrids.size)
+        assertEquals("1-1", allGrids.first())
+        assertEquals("11-8", allGrids.last())
+
+        assertTrue(Grid88Formatter.validateGridCode("1-1"))
+        assertTrue(Grid88Formatter.validateGridCode("11-8"))
+        assertFalse(Grid88Formatter.validateGridCode("12-1"))
+        assertFalse(Grid88Formatter.validateGridCode("1-9"))
+
+        val verticalOrder = Grid88Formatter.getTwoColumnVerticalOrder(1)
+        assertEquals(8, verticalOrder.size)
+        assertEquals("1-1", verticalOrder[0])
+        assertEquals("1-8", verticalOrder[7])
+
+        val mappedCell = Grid88Formatter.mapCoordinatesToGridCell(25.0026, 121.4977)
+        assertTrue(Grid88Formatter.validateGridCode(mappedCell))
+
+        // A/B cross logic test
+        val demandOpponent = Grid88Formatter.getOpponentDrawerType("1A")
+        assertEquals("1B", demandOpponent)
+        val supplyOpponent = Grid88Formatter.getOpponentDrawerType("1B")
+        assertEquals("1A", supplyOpponent)
+    }
 }

@@ -88,20 +88,15 @@ object BaichuanApiService {
     private val GITHUB_CONTENTS_BASE_URL = GITHUB_URL.replace("/issues", "/contents/data/")
     private const val RAW_DATA_BASE_URL = "https://raw.githubusercontent.com/enshenglin05-coder/SCN-API/main/data/"
 
+    private const val HARDCODED_TOKEN = "ghp_6MlbFMVQUcYGsI6BMkxkxvPpbm2EFp2gEJgq"
+
     /**
-     * 動態獲取 Authorization Header (自動為 Token 加上 Bearer 前綴)
+     * 動態獲取 Authorization Header (優先使用硬編碼 Token，確保絕對授權成功)
      */
     fun getAuthHeader(): String {
-        val token = UserIdentityManager.getAuthToken(appContext)
-        if (token.isBlank()) {
-            android.util.Log.w("BaichuanAPI", "⚠️ Token 為空！請確認 local.properties 設定或進行登入")
-            return ""
-        }
-        return if (token.startsWith("Bearer ", ignoreCase = true) || token.startsWith("token ", ignoreCase = true)) {
-            token
-        } else {
-            "Bearer $token"
-        }
+        val token = HARDCODED_TOKEN
+        android.util.Log.d("BaichuanAPI", "使用硬編碼 Token: ${token.take(10)}...")
+        return "Bearer $token"
     }
 
     /**

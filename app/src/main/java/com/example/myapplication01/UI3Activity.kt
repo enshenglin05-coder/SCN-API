@@ -834,6 +834,7 @@ class UI3Activity : BaseActivity() {
         btnClearDraft?.setOnClickListener { showClearDraftDialog() }
         btnSaveDraft?.setOnClickListener { saveDraft(); Toast.makeText(this, getString(R.string.msg_draft_saved), Toast.LENGTH_SHORT).show() }
         btnRefreshList?.setOnClickListener {
+            android.util.Log.d("CardRefresh", "手動觸發刷新列表，距離設定: ${limitDistanceKm}km")
             LocationFlowManager.onRefreshListClicked(this) {
                 applyFilterAndRefresh()
                 DeityBlessingTTS.speakCurrentBlessing(this)
@@ -941,6 +942,7 @@ class UI3Activity : BaseActivity() {
     }
 
     private fun applyFilterAndRefresh() {
+        android.util.Log.d("CardRefresh", "開始過濾與刷新列表，當前設定距離: ${limitDistanceKm}km, 座標: ($userLat, $userLng)")
         if (userLat == null || userLng == null) {
             Toast.makeText(this, "請點擊上方『我的位置』刷新列表", Toast.LENGTH_SHORT).show()
             filteredCards.clear()
@@ -952,16 +954,19 @@ class UI3Activity : BaseActivity() {
         val currentType = if (tabLayoutType?.selectedTabPosition == 0) MatchingCore.TYPE_A_DEMAND else MatchingCore.TYPE_B_SUPPLY
         val targetOpponentType = MatchingCore.getTargetOpponentType(currentType)
         
+        android.util.Log.d("CardRefresh", "交叉邏輯對齊: 當前類型=$currentType (A:需求/B:供給), 對手目標類型=$targetOpponentType")
+
         val targetCatIds = catId?.let { listOf(it) } ?: emptyList()
-        val cards = BaichuanRepository.getFilteredCards(
+        // 確保精確傳遞 UI2 設定的 limitDistanceKm 至 Repository，進而觸發 GeoBoundingBoxFilter 數學運算
+        BaichuanRepository.getFilteredCards(
             userLat, userLng, targetCatIds, targetOpponentType, currentDeviceId, limitDistanceKm
         ) {
-            runOnUiThread { updateUIList() }
+            runOnUiThread { 
+                updateUIList()
+                android.util.Log.d("CardRefresh", "列表刷新完成 (對應 88 格抽屜編碼邏輯)，共 ${filteredCards.size} 筆")
+                adapter?.notifyDataSetChanged()
+            }
         }
-        filteredCards.clear()
-        filteredCards.addAll(cards)
-        adapter?.updateData(filteredCards, userLat, userLng)
-        swipeRefreshLayout?.isRefreshing = false
     }
 
     private fun updateUIList() {
