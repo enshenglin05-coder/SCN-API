@@ -136,7 +136,7 @@ object BaichuanApiService {
     }
 
     /**
-     * 發布卡片數據 (Targeted File Write)
+     * 發布卡片數據 (Targeted File Write with Public CDN Read + Auth Write)
      * 寫入目標端點: https://api.github.com/repos/enshenglin05-coder/SCN-API/contents/data/<category_code>.json
      */
     fun publishCard(card: RequirementCard, onSuccess: () -> Unit, onError: (String) -> Unit) {
@@ -148,55 +148,68 @@ object BaichuanApiService {
         }
 
         val fileName = "$categoryCode.json"
+        val rawUrl = "$RAW_DATA_BASE_URL$fileName"
         val contentsUrl = "$GITHUB_CONTENTS_BASE_URL$fileName"
-        android.util.Log.d("BaichuanAPI", "🚀 準備發布卡片至 SCN-API 88格資料路由: $contentsUrl (類別代碼: $categoryCode)")
+        android.util.Log.d("BaichuanAPI", "🚀 準備發布卡片，先透過公開 CDN 讀取現有資料: $rawUrl")
 
         val getRequest = Request.Builder()
-            .url(contentsUrl)
+            .url(rawUrl)
             .get()
             .build()
 
         client.newCall(getRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                android.util.Log.e("BaichuanAPI", "Publish/Get 失敗: ${e.message}")
-                onError(e.message ?: "Network Connection Error")
+                android.util.Log.w("BaichuanAPI", "⚠️ 公開 CDN 讀取失敗（可能尚無舊資料），繼續執行寫入: ${e.message}")
+                fetchFileSha(contentsUrl) { sha ->
+                    val cards = mutableListOf(card)
+                    writeToGitHub(contentsUrl, cards, sha, onSuccess, onError)
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val code = response.code
                 val bodyString = response.body?.string() ?: ""
                 response.close()
 
-                var sha: String? = null
                 val cards = mutableListOf<RequirementCard>()
+                if (response.isSuccessful && bodyString.isNotEmpty()) {
+                    try {
+                        val existingCards = gson.fromJson(bodyString, Array<RequirementCard>::class.java)
+                        cards.addAll(existingCards)
+                    } catch (e: Exception) {
+                        android.util.Log.e("BaichuanAPI", "解析現有 CDN 檔案失敗: ${e.message}")
+                    }
+                }
 
+                fetchFileSha(contentsUrl) { sha ->
+                    cards.removeAll { it.publisher_device_id == card.publisher_device_id && it.drawer_type == card.drawer_type }
+                    cards.add(card)
+                    writeToGitHub(contentsUrl, cards, sha, onSuccess, onError)
+                }
+            }
+        })
+    }
+
+    private fun fetchFileSha(contentsUrl: String, onShaResult: (String?) -> Unit) {
+        val request = Request.Builder()
+            .url(contentsUrl)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onShaResult(null)
+            }
+            override fun onResponse(call: Call, response: Response) {
+                val bodyString = response.body?.string() ?: ""
+                response.close()
+                var sha: String? = null
                 if (response.isSuccessful) {
                     try {
                         val fileInfo = gson.fromJson(bodyString, Map::class.java)
                         sha = fileInfo["sha"] as? String
-                        val base64Content = fileInfo["content"] as? String ?: ""
-                        val decoded = android.util.Base64.decode(base64Content.replace("\n", ""), android.util.Base64.DEFAULT)
-                        val json = String(decoded)
-                        val existingCards = gson.fromJson(json, Array<RequirementCard>::class.java)
-                        cards.addAll(existingCards)
-                    } catch (e: Exception) {
-                        android.util.Log.e("BaichuanAPI", "解析現有檔案失敗: ${e.message}")
-                    }
-                } else if (code == 404) {
-                    sha = null
-                } else if (code == 401 || code == 403) {
-                    onError("401 Unauthorized")
-                    return
-                } else {
-                    android.util.Log.e("BaichuanAPI", "Publish/Get 錯誤 HTTP $code: $bodyString")
-                    onError("HTTP $code: $bodyString")
-                    return
+                    } catch (_: Exception) {}
                 }
-
-                cards.removeAll { it.publisher_device_id == card.publisher_device_id && it.drawer_type == card.drawer_type }
-                cards.add(card)
-
-                writeToGitHub(contentsUrl, cards, sha, onSuccess, onError)
+                onShaResult(sha)
             }
         })
     }
