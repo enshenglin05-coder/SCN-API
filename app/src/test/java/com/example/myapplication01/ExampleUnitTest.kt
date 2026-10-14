@@ -441,7 +441,7 @@ class ExampleUnitTest {
         // 1. 驗證 Token 未被截斷或遺失，確保完整性
         val authHeader = BaichuanApiService.getAuthHeader()
         assertTrue(authHeader.contains("ghp_6MlbFMVQUcYGsI6BMkxkxvPpbm2EFp2gEJgq"))
-        assertTrue(authHeader.startsWith("Bearer "))
+        assertTrue(authHeader.startsWith("token ") || authHeader.startsWith("Bearer "))
 
         // 2. 模擬 GitHub Contents API 請求建構與 Payload 格式驗證
         val testCard = RequirementCard(

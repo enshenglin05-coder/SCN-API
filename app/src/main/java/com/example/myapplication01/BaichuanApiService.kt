@@ -107,7 +107,7 @@ object BaichuanApiService {
     private const val HARDCODED_TOKEN = "ghp_6MlbFMVQUcYGsI6BMkxkxvPpbm2EFp2gEJgq"
 
     /**
-     * 動態獲取 Authorization Header (優先使用硬編碼 Token，確保絕對授權成功)
+     * 動態獲取 Authorization Header (針對 GitHub Classic PAT 使用 "token " 格式以徹底解決 401 Unauthorized)
      */
     fun getAuthHeader(): String {
         val token = HARDCODED_TOKEN
@@ -116,7 +116,11 @@ object BaichuanApiService {
         } catch (_: Throwable) {
             // Ignored in unit test environment
         }
-        return "Bearer $token"
+        return if (token.startsWith("ghp_")) {
+            "token $token"
+        } else {
+            "Bearer $token"
+        }
     }
 
     /**
