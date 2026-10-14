@@ -133,11 +133,19 @@ object BaichuanApiService {
 
     /**
      * 發布卡片數據 (Targeted File Write)
+     * 寫入目標端點: https://api.github.com/repos/enshenglin05-coder/SCN-API/contents/data/<category_code>.json
      */
     fun publishCard(card: RequirementCard, onSuccess: () -> Unit, onError: (String) -> Unit) {
         val categoryCode = card.category_code
+        if (!Grid88Formatter.validateGridCode(categoryCode)) {
+            android.util.Log.e("BaichuanAPI", "❌ 發布失敗：無效的 88 格編碼 $categoryCode")
+            onError("Invalid 88-grid category code: $categoryCode")
+            return
+        }
+
         val fileName = "$categoryCode.json"
         val contentsUrl = "$GITHUB_CONTENTS_BASE_URL$fileName"
+        android.util.Log.d("BaichuanAPI", "🚀 準備發布卡片至 SCN-API 88格資料路由: $contentsUrl (類別代碼: $categoryCode)")
 
         val getRequest = Request.Builder()
             .url(contentsUrl)

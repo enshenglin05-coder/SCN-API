@@ -469,4 +469,15 @@ class ExampleUnitTest {
         assertTrue(Grid88Formatter.validateGridCode(gridCode))
         assertEquals("1B", Grid88Formatter.getOpponentDrawerType("1A"))
     }
+
+    @Test
+    fun testScnApiDataRoutingPathFor88Grids() {
+        val allGrids = Grid88Formatter.getAllGridCodes()
+        assertEquals(88, allGrids.size)
+        allGrids.forEach { code ->
+            val expectedPath = "https://api.github.com/repos/enshenglin05-coder/SCN-API/contents/data/$code.json"
+            assertTrue(expectedPath.contains("/contents/data/$code.json"))
+            assertTrue(Grid88Formatter.validateGridCode(code))
+        }
+    }
 }
