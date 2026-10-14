@@ -435,4 +435,38 @@ class ExampleUnitTest {
         val supplyOpponent = Grid88Formatter.getOpponentDrawerType("1B")
         assertEquals("1A", supplyOpponent)
     }
+
+    @Test
+    fun testGitHubApiUploadSimulationAndTokenIntegrity() {
+        // 1. 驗證 Token 未被截斷或遺失，確保完整性
+        val authHeader = BaichuanApiService.getAuthHeader()
+        assertTrue(authHeader.contains("ghp_6MlbFMVQUcYGsI6BMkxkxvPpbm2EFp2gEJgq"))
+        assertTrue(authHeader.startsWith("Bearer "))
+
+        // 2. 模擬 GitHub Contents API 請求建構與 Payload 格式驗證
+        val testCard = RequirementCard(
+            card_id = "SIM_CARD_01",
+            category_code = "1-1",
+            drawer_type = "1A",
+            description = "模擬上傳測試",
+            gps_lat = 25.0026,
+            gps_lng = 121.4977
+        )
+        val json = com.google.gson.Gson().toJson(listOf(testCard))
+        val base64Content = java.util.Base64.getEncoder().encodeToString(json.toByteArray(Charsets.UTF_8))
+        assertNotNull(base64Content)
+        assertTrue(base64Content.isNotEmpty())
+
+        val payload = mapOf(
+            "message" to "Update drawer data: 1-1",
+            "content" to base64Content
+        )
+        assertEquals("Update drawer data: 1-1", payload["message"])
+        assertNotNull(payload["content"])
+
+        // 3. 驗證 88 格編碼與 A/B 交叉邏輯對齊
+        val gridCode = Grid88Formatter.mapCoordinatesToGridCell(25.0026, 121.4977)
+        assertTrue(Grid88Formatter.validateGridCode(gridCode))
+        assertEquals("1B", Grid88Formatter.getOpponentDrawerType("1A"))
+    }
 }

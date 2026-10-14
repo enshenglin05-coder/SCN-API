@@ -111,7 +111,11 @@ object BaichuanApiService {
      */
     fun getAuthHeader(): String {
         val token = HARDCODED_TOKEN
-        android.util.Log.d("BaichuanAPI", "使用硬編碼 Token: ${token.take(10)}...")
+        try {
+            android.util.Log.d("BaichuanAPI", "使用硬編碼 Token: ${token.take(10)}...")
+        } catch (_: Throwable) {
+            // Ignored in unit test environment
+        }
         return "Bearer $token"
     }
 
