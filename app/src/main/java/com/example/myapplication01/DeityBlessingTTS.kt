@@ -12,8 +12,8 @@ object DeityBlessingTTS {
     private var ttsManager: TtsManager? = null
 
     fun init(context: Context) {
-        if (ttsManager == null) {
-            ttsManager = TtsManager(context)
+        if (ttsManager == null || ttsManager?.isReady() == false) {
+            ttsManager = TtsManager(context.applicationContext)
         }
     }
 
@@ -34,7 +34,9 @@ object DeityBlessingTTS {
      * 播放當前選定神明的祝福詞
      */
     fun speakCurrentBlessing(context: Context) {
+        init(context)
         updateLanguage()
+        val appContext = context.applicationContext
         
         // 1. 取得當前語系的所有卡片
         val cards = ReligionRepository.getCardsByLanguage(GlobalState.selectedLanguageCode)
@@ -45,9 +47,9 @@ object DeityBlessingTTS {
         
         // 3. 取得文字內容 (優先使用 ID 對應的翻譯，若無則回退至全域存儲或預設值)
         val blessingText = if (card != null) {
-            context.getString(card.descResId)
+            appContext.getString(card.descResId)
         } else {
-            GlobalState.selectedBlessingText ?: context.getString(R.string.msg_publish_success_default)
+            GlobalState.selectedBlessingText ?: appContext.getString(R.string.msg_publish_success_default)
         }
         
         // 4. 執行異步非阻塞播報
@@ -57,7 +59,14 @@ object DeityBlessingTTS {
     /**
      * 播放任意文字 (非阻塞)
      */
-    fun speak(text: String) {
+    fun speak(text: String, context: Context? = null) {
+        context?.let { init(it) }
+        updateLanguage()
+        ttsManager?.speak(text, utteranceId = "GENERIC_FEEDBACK")
+    }
+
+    fun speak(context: Context, text: String) {
+        init(context)
         updateLanguage()
         ttsManager?.speak(text, utteranceId = "GENERIC_FEEDBACK")
     }

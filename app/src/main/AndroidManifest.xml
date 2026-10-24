@@ -7,7 +7,26 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <queries>
+        <package android:name="jp.naver.line.android" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="com.tencent.mm" />
+        <package android:name="com.google.android.apps.maps" />
         <package android:name="com.google.android.apps.bard" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="text/plain" />
@@ -45,6 +64,9 @@
             android:name=".UI3Activity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".AiModalityActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

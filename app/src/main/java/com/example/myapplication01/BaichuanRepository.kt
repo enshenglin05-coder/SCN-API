@@ -1,5 +1,6 @@
 package com.example.myapplication01
 
+import android.content.Context
 import com.example.myapplication01.repository.core.GeoBoundingBoxFilter
 import java.util.concurrent.ConcurrentHashMap
 
@@ -25,9 +26,17 @@ object BaichuanRepository {
     
     private const val MAX_REPORT_THRESHOLD = 3
 
-    init {
-        // 初始化載入 Drawer 1-1 ("在地攤商 / 個人私廚") 測試卡片資料集
+    fun init(context: Context) {
+        // 初始化倉儲、12小時自動抹除與 Git 雲端同步循環
+        purgeExpiredCards()
         seedTestDrawerData()
+        GitSyncScheduler.startSyncLoop()
+    }
+
+    init {
+        // 初始化載入測試卡片與搜尋引擎情境推理 88 個卡片項目
+        seedTestDrawerData()
+        GitSyncScheduler.startSyncLoop()
     }
 
     /**
@@ -48,11 +57,12 @@ object BaichuanRepository {
     }
 
     /**
-     * 批次載入預設測試抽屜資料 (1-1, 4-1, 4-2)
+     * 批次載入預設測試抽屜資料 (1-1, 4-1, 4-2 及搜尋引擎情境推理 88 卡片)
      */
     fun seedTestDrawerData() {
         clearAll()
         DrawerBatchTester.seedRepositoryWithTestCards()
+        SearchEngineReasoningEngine.generateAndPublish88Cards()
     }
 
     /**
@@ -78,13 +88,18 @@ object BaichuanRepository {
         val catCode = card.category_code
         val categoryMap = partitionedCards.getOrPut(catCode) { ConcurrentHashMap() }
 
-        // 1.0 覆蓋邏輯：移除該發布者在該類別下的舊卡片 (官方節點與測試卡片除外)
+        // 先刪除本地舊記錄（官方節點與測試卡片除外），確保無任何殘留碎屑
         if (card.publisher_device_id != "SYSTEM_ADMIN" && !card.is_test_only) {
-            val oldCardId = categoryMap.values.find { 
-                it.publisher_device_id == card.publisher_device_id && it.drawer_type == card.drawer_type 
-            }?.card_id
-            oldCardId?.let { categoryMap.remove(it) }
+            val keysToRemove = mutableListOf<String>()
+            for ((key, existingCard) in categoryMap) {
+                if (existingCard.publisher_device_id == card.publisher_device_id && existingCard.drawer_type == card.drawer_type) {
+                    keysToRemove.add(key)
+                }
+            }
+            keysToRemove.forEach { categoryMap.remove(it) }
         }
+
+        // 全新寫入最新卡片
         categoryMap[card.card_id] = card
         
         // 僅供展示測試不寫入遠端永久資料庫
@@ -96,6 +111,16 @@ object BaichuanRepository {
             })
         } else {
             onSuccess?.invoke()
+        }
+    }
+
+    /**
+     * 自動清除/抹除所有超過 12 小時的暫存卡片資料 (真實與虛擬卡片一律生效)
+     */
+    fun purgeExpiredCards(nowMillis: Long = System.currentTimeMillis()) {
+        for (map in partitionedCards.values) {
+            val expiredKeys = map.filter { (_, card) -> card.isExpired(nowMillis) }.keys
+            expiredKeys.forEach { map.remove(it) }
         }
     }
 
@@ -112,21 +137,9 @@ object BaichuanRepository {
         onFetchComplete: (() -> Unit)? = null
     ): List<RequirementCard> {
         
-        // 1. 觸發遠端精準抓取
-        if (onFetchComplete != null && categoryCodes.isNotEmpty()) {
-            BaichuanApiService.fetchCardsByCategories(categoryCodes) { remoteCards ->
-                // 【關鍵修正】先清空本次請求分類的本地緩存，確保已下架或過期的卡片不會殘留
-                categoryCodes.forEach { code ->
-                    partitionedCards[code]?.clear()
-                }
-                
-                remoteCards.forEach { card -> 
-                    val catMap = partitionedCards.getOrPut(card.category_code) { ConcurrentHashMap() }
-                    catMap[card.card_id] = card 
-                }
-                onFetchComplete.invoke()
-            }
-        }
+        // 1. 自動執行 12 小時暫存抹除作業，並回傳本地記憶體快取
+        purgeExpiredCards()
+        onFetchComplete?.invoke()
 
         // 2. 僅從請求的「抽屜」(Partitions) 中提取數據，禁止全量 filter()
         val sourcePool = mutableListOf<RequirementCard>()

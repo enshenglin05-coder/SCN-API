@@ -42,7 +42,6 @@ import java.util.Locale
 
 class UI1Activity : BaseActivity() {
 
-    private lateinit var ttsManager: TtsManager
     private var currentLanguageCode = "zh-TW"
     
     // 記錄當前選定的信仰卡片，預設為 null (未選擇)
@@ -50,8 +49,14 @@ class UI1Activity : BaseActivity() {
     
     private lateinit var btnExit: TextView
     private lateinit var btnLocation: TextView
+    private lateinit var btnAiModality: TextView
     private lateinit var btnLanguagePicker: TextView
     private lateinit var spinnerLanguage: Spinner
+    private lateinit var btnBoxZh: TextView
+    private lateinit var btnBoxEn: TextView
+    private lateinit var btnBoxJa: TextView
+    private lateinit var btnBoxKo: TextView
+    private lateinit var btnBoxVi: TextView
     private lateinit var tvHint: TextView
     private lateinit var recyclerViewBlessings: RecyclerView
     private lateinit var btnEnterUI2: Button
@@ -92,7 +97,7 @@ class UI1Activity : BaseActivity() {
         
         // 刪除多餘的 checkConsent()，由 TermsPrivacyActivity 統一處理
 
-        ttsManager = TtsManager(this)
+        DeityBlessingTTS.init(this)
 
         setupListeners()
         setupLanguageSpinner()
@@ -106,8 +111,18 @@ class UI1Activity : BaseActivity() {
     private fun initViews() {
         btnExit = findViewById(R.id.btnExit)
         btnLocation = findViewById(R.id.btnLocation)
+        btnAiModality = findViewById(R.id.btnAiModality)
+        btnAiModality.bringToFront()
         btnLanguagePicker = findViewById(R.id.btnLanguagePicker)
         spinnerLanguage = findViewById(R.id.spinnerLanguage)
+        btnBoxZh = findViewById(R.id.btnBoxZh)
+        btnBoxEn = findViewById(R.id.btnBoxEn)
+        btnBoxJa = findViewById(R.id.btnBoxJa)
+        btnBoxKo = findViewById(R.id.btnBoxKo)
+        btnBoxVi = findViewById(R.id.btnBoxVi)
+        
+        setupToolboxListeners()
+
         tvHint = findViewById(R.id.tvHint)
         recyclerViewBlessings = findViewById(R.id.recyclerViewBlessings)
         btnEnterUI2 = findViewById(R.id.btnEnterUI2)
@@ -130,6 +145,72 @@ class UI1Activity : BaseActivity() {
         updateLocationButtonState()
     }
 
+    private fun setupToolboxListeners() {
+        btnBoxZh.setOnClickListener { switchLanguage("zh-TW") }
+        btnBoxEn.setOnClickListener { switchLanguage("en") }
+        btnBoxJa.setOnClickListener { switchLanguage("ja") }
+        btnBoxKo.setOnClickListener { switchLanguage("ko") }
+        btnBoxVi.setOnClickListener { switchLanguage("vi") }
+    }
+
+    private fun switchLanguage(langCode: String) {
+        if (langCode != currentLanguageCode) {
+            currentLanguageCode = langCode
+            GlobalState.selectedLanguageCode = langCode
+            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(langCode)
+            AppCompatDelegate.setApplicationLocales(appLocale)
+
+            updateStaticUIText()
+            updateToolboxSelection(langCode)
+            updateTTSLanguage(langCode)
+            loadCardsByLanguage(langCode)
+
+            val pos = when (langCode) {
+                "zh-TW" -> 0
+                "en" -> 1
+                "ja" -> 2
+                "ko" -> 3
+                "vi" -> 4
+                else -> 0
+            }
+            spinnerLanguage.setSelection(pos, false)
+
+            selectedReligionCard = null
+            cbSelectionVerify.isChecked = false
+            btnEnterUI2.isEnabled = false
+            btnEnterUI2.alpha = 0.5f
+
+            Toast.makeText(this, "已切換語言 / Language Switched: ${getLangDisplayName(langCode)}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateToolboxSelection(activeLang: String) {
+        val activeColor = Color.parseColor("#00FFC2")
+        val inactiveColor = Color.WHITE
+
+        val buttons = listOf(btnBoxZh, btnBoxEn, btnBoxJa, btnBoxKo, btnBoxVi)
+        val codes = listOf("zh-TW", "en", "ja", "ko", "vi")
+
+        for (i in codes.indices) {
+            val isSelected = codes[i] == activeLang
+            buttons[i].setTextColor(if (isSelected) activeColor else inactiveColor)
+            buttons[i].setTypeface(null, if (isSelected) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+            buttons[i].scaleX = if (isSelected) 1.05f else 1.0f
+            buttons[i].scaleY = if (isSelected) 1.05f else 1.0f
+        }
+    }
+
+    private fun getLangDisplayName(code: String): String {
+        return when (code) {
+            "zh-TW" -> "繁體中文"
+            "en" -> "English"
+            "ja" -> "日本語"
+            "ko" -> "한국어"
+            "vi" -> "Tiếng Việt"
+            else -> "繁體中文"
+        }
+    }
+
     private fun handleWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -148,6 +229,13 @@ class UI1Activity : BaseActivity() {
 
         btnLocation.setOnClickListener {
             checkPermissionAndFetchLocation()
+        }
+
+        btnAiModality.setOnClickListener {
+            android.util.Log.d("AiButton", "啟動 AI 按鈕被點擊 (UI1 -> UI4)")
+            Toast.makeText(this, "正在跳轉至 AI 模態全螢幕頁面 (UI4)...", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AiModalityActivity::class.java)
+            startActivity(intent)
         }
 
         btnLanguagePicker.setOnClickListener {
@@ -181,6 +269,8 @@ class UI1Activity : BaseActivity() {
         }
         spinnerLanguage.setSelection(initialPosition, false)
         currentLanguageCode = if (currentTags.isEmpty()) "zh-TW" else currentTags.split(",")[0]
+        GlobalState.selectedLanguageCode = currentLanguageCode
+        updateToolboxSelection(currentLanguageCode)
 
         spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -194,20 +284,7 @@ class UI1Activity : BaseActivity() {
                 }
                 
                 if (newLangCode != currentLanguageCode) {
-                    currentLanguageCode = newLangCode
-                    GlobalState.selectedLanguageCode = newLangCode
-                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(newLangCode)
-                    AppCompatDelegate.setApplicationLocales(appLocale)
-                    
-                    updateStaticUIText()
-                    updateTTSLanguage(currentLanguageCode)
-                    loadCardsByLanguage(currentLanguageCode)
-                    
-                    // 切換語言時重置選擇狀態以確保正確性
-                    selectedReligionCard = null
-                    cbSelectionVerify.isChecked = false
-                    btnEnterUI2.isEnabled = false
-                    btnEnterUI2.alpha = 0.5f
+                    switchLanguage(newLangCode)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -332,28 +409,14 @@ class UI1Activity : BaseActivity() {
     }
 
     private fun updateTTSLanguage(langCode: String) {
-        if (!::ttsManager.isInitialized) return
-        val locale = when (langCode) {
-            "zh-TW" -> Locale.TRADITIONAL_CHINESE
-            "en" -> Locale.US
-            "ja" -> Locale.JAPAN
-            "ko" -> Locale.KOREA
-            "vi" -> Locale("vi", "VN")
-            else -> Locale.TRADITIONAL_CHINESE
-        }
-        ttsManager.setLanguage(locale)
+        DeityBlessingTTS.updateLanguage()
     }
 
     private fun playTTS(text: String) {
-        if (::ttsManager.isInitialized) {
-            ttsManager.speak(text, utteranceId = "UI1_TTS")
-        }
+        DeityBlessingTTS.speakCurrentBlessing(this)
     }
 
     override fun onDestroy() {
-        if (::ttsManager.isInitialized) {
-            ttsManager.shutdown()
-        }
         super.onDestroy()
     }
 }

@@ -1,7 +1,9 @@
 package com.example.myapplication01
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,7 +87,21 @@ class RequirementAdapter(
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_viewport_publish, parent, false)
             PublishViewHolder(view)
         } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_requirement_post, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_requirement_post, parent, false).apply {
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { view ->
+                    view.isClickable = true
+                    view.isFocusable = true
+                    // 絕對不呼叫 super 或傳遞給下層
+                }
+                setOnTouchListener { v, event ->
+                    if (event.action == android.view.MotionEvent.ACTION_UP) {
+                        v.performClick()
+                    }
+                    true
+                }
+            }
             CardViewHolder(view)
         }
     }
@@ -115,7 +131,7 @@ class RequirementAdapter(
         holder.cvDescriptionCompose.backgroundTintList = tintColorStateList
 
         // 1. 基本資訊與色彩同步
-        val drawerTitle = CategoryRepository.getCategoryTitle(card.category_code)
+        val drawerTitle = CategoryRepository.getCategoryTitle(card.category_code, context)
         holder.tvCategoryTag.text = TextFormatter.formatCardTitle(drawerTitle)
         holder.tvCategoryTag.maxLines = 2
         holder.tvCategoryTag.setTextColor(themeColorInt) // 同步主題色
@@ -123,23 +139,41 @@ class RequirementAdapter(
         holder.tvCardId.visibility = View.GONE // 1.0 隱藏內部 ID
         holder.tvLikeCount.text = card.like_count.toString()
         holder.tvDislikeCount.text = card.dislike_count.toString()
-        holder.tvReportCount.text = "檢舉 ${card.reporter_ids.size}"
+        val reportLabel = context.getString(R.string.label_report)
+        holder.tvReportCount.text = "$reportLabel ${card.reporter_ids.size}"
 
         // 2. 時間
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        holder.tvPublishTime.text = "發布時間：${sdf.format(Date(card.created_at))}"
+        val publishTimeLabel = context.getString(R.string.card_lbl_time)
+        holder.tvPublishTime.text = "$publishTimeLabel ${sdf.format(Date(card.created_at))}"
 
-        // 3. 座標與距離及動態編號 (例如 【卡片 #01】)
-        val latStr = String.format(Locale.getDefault(), "%.6f", card.gps_lat)
-        val lngStr = String.format(Locale.getDefault(), "%.6f", card.gps_lng)
+        // 3. Google Map 位置渲染防護與動態經緯度劃分 (區分發送者與預設卡片)
         val curLat = userLat
         val curLng = userLng
+        val distLabel = context.getString(R.string.card_lbl_dist)
         val distText = if (curLat != null && curLng != null) {
             val d = DistanceUtils.calculateDistance(curLat, curLng, card.gps_lat, card.gps_lng)
-            " (距離: ${String.format(Locale.getDefault(), "%.2f", d)} km)"
+            " ($distLabel: ${String.format(Locale.getDefault(), "%.2f", d)} km)"
         } else ""
         val cardIndexStr = String.format(Locale.getDefault(), "【卡片 #%02d】", index + 1)
-        holder.tvLocationCoords.text = "位置: $latStr, $lngStr$distText $cardIndexStr"
+        val locationPrefix = context.getString(R.string.label_location_prefix)
+
+        if (card.isPresetCard()) {
+            // 預設卡片 (靜態卡片)：強制顯示「無法讀取該卡片位置資訊」
+            holder.tvLocationCoords.text = "$locationPrefix 無法讀取該卡片位置資訊$distText $cardIndexStr"
+        } else {
+            // 發送者卡片 (真實卡片)：顯示發送者設定之動態經緯度
+            val latStr = String.format(Locale.getDefault(), "%.6f", card.gps_lat)
+            val lngStr = String.format(Locale.getDefault(), "%.6f", card.gps_lng)
+            holder.tvLocationCoords.text = "$locationPrefix $latStr, $lngStr$distText $cardIndexStr"
+        }
+
+        // 為位置渲染區區塊綁定統一導航入口點擊事件
+        holder.tvLocationCoords.isClickable = true
+        holder.tvLocationCoords.isFocusable = true
+        holder.tvLocationCoords.setOnClickListener {
+            MapUtils.openGoogleMapsForCard(context, card)
+        }
 
         // 4. Header 按鈕邏輯 (一鍵打包 & AI 發布)
         holder.cvHeaderPackBorder.apply {
@@ -164,10 +198,18 @@ class RequirementAdapter(
                 ) {}
             }
         }
-        holder.btnHeaderPack.setOnClickListener { onAction(ActionType.PACK, card, it) }
-        holder.btnHeaderAi.setOnClickListener { onAction(ActionType.AI, card, it) }
+        holder.btnHeaderPack.setOnClickListener { /* 絕對不做任何事情，保持乾淨 */ }
+        holder.btnHeaderAi.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.AI, card, view)
+        }
 
         // 5. 說明文字與展開邏輯 (精準修復：切換為 Compose State 驅動)
+        val descPrefix = context.getString(R.string.label_desc_prefix)
+        val textLess = context.getString(R.string.btn_less)
+        val textMore = context.getString(R.string.btn_more)
+        
         holder.cvDescriptionCompose.setContent {
             // 使用 remember(card.card_id) 確保在 RecyclerView 複用時狀態正確對應
             var isExpanded by remember(card.card_id) { mutableStateOf(false) }
@@ -179,7 +221,7 @@ class RequirementAdapter(
                     .clickable { isExpanded = !isExpanded }
             ) {
                 Text(
-                    text = "說明：${card.description}",
+                    text = "$descPrefix ${card.description}",
                     color = ComposeColor(themeColorInt),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
@@ -192,7 +234,7 @@ class RequirementAdapter(
 
                 // 展開/收起 按鈕
                 Text(
-                    text = if (isExpanded) "（收起）" else "（展開）",
+                    text = if (isExpanded) textLess else textMore,
                     color = if (isExpanded) ComposeColor(0xFF00FFFF) else ComposeColor(0xFF4285F4),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
@@ -226,11 +268,12 @@ class RequirementAdapter(
         holder.btnDislikeGroup.setOnClickListener { onAction(ActionType.DISLIKE, card, it) }
         holder.btnRiskControlMenu.setOnClickListener { onAction(ActionType.MENU, card, it) }
 
-        // 7. 通訊按鈕顏色邏輯 (11x8 統一外殼模組化)
+        // 7. 通訊按鈕與電話撥打對接邏輯 (11x8 統一外殼模組化)
         val contactPrefix = card.contact_method.name
+        val cleanVal = ContactUtils.cleanContactValue(card.contact_value)
 
-        // 7.1 通訊對接按鈕 (LINE/WeChat/Telegram/Phone)
-        if (card.contact_value.isNotEmpty()) {
+        // 7.1 社交通訊按鈕 (LINE / WeChat / Telegram)
+        if (card.contact_value.isNotEmpty() && card.contact_method != RequirementCard.ContactMethod.PHONE) {
             holder.flContactAction.visibility = View.VISIBLE
             
             // 獨立套用 128 色流光邊框
@@ -246,7 +289,6 @@ class RequirementAdapter(
                 }
             }
 
-            val cleanVal = ContactUtils.cleanContactValue(card.contact_value)
             when (card.contact_method) {
                 RequirementCard.ContactMethod.LINE -> {
                     holder.btnContactAction.text = "💬 LINE ID ($cleanVal)"
@@ -260,13 +302,9 @@ class RequirementAdapter(
                     holder.btnContactAction.text = "💬 WeChat ID (微信: $cleanVal)"
                     holder.btnContactAction.setTextColor(Color.parseColor("#07C160"))
                 }
-                RequirementCard.ContactMethod.PHONE -> {
-                    holder.btnContactAction.text = "💬 撥打電話/簡訊 ($cleanVal)"
-                    holder.btnContactAction.setTextColor(Color.parseColor("#4285F4"))
-                }
                 else -> {
                     holder.btnContactAction.text = "$contactPrefix ($cleanVal)"
-                    holder.btnContactAction.setTextColor(themeColorInt) // 同步主題色
+                    holder.btnContactAction.setTextColor(themeColorInt)
                 }
             }
             holder.btnContactAction.backgroundTintList = null
@@ -274,33 +312,45 @@ class RequirementAdapter(
             holder.flContactAction.visibility = View.GONE
         }
 
-        // 7.2 電話撥打按鈕 (原生佈局)
-        val isDuplicatePhone = card.contact_method == RequirementCard.ContactMethod.PHONE && 
-            card.contact_value == card.phone_number
-
-        if (!card.phone_number.isNullOrEmpty() && !isDuplicatePhone) {
-            holder.flPhoneAction.visibility = View.VISIBLE
-            
-            // 獨立套用 128 色流光邊框
-            holder.cvPhoneBorder.apply {
-                isClickable = false
-                isFocusable = false
-                setContent {
-                    RainbowBorderWrapper(
-                        modifier = Modifier.fillMaxSize(),
-                        cornerRadius = 22.dp,
-                        borderWidth = 2.2.dp
-                    ) {}
-                }
+        // 7.2 原生電話撥打按鈕 (強制顯示，無論是否有值皆可見)
+        holder.flPhoneAction.visibility = View.VISIBLE
+        
+        // 獨立套用 128 色流光邊框
+        holder.cvPhoneBorder.apply {
+            isClickable = false
+            isFocusable = false
+            setContent {
+                RainbowBorderWrapper(
+                    modifier = Modifier.fillMaxSize(),
+                    cornerRadius = 22.dp,
+                    borderWidth = 2.2.dp
+                ) {}
             }
-
-            holder.btnPhoneAction.text = "📞 撥打電話 (${card.phone_number})"
-            holder.btnPhoneAction.setTextColor(Color.parseColor("#4285F4"))
-            holder.btnPhoneAction.backgroundTintList = null
-            holder.btnPhoneAction.setOnClickListener { onAction(ActionType.PHONE_CALL, card, it) }
-        } else {
-            holder.flPhoneAction.visibility = View.GONE
         }
+
+        val phoneForDialing = card.getPhoneForDialing()
+        val displayText = if (!phoneForDialing.isNullOrEmpty()) {
+            "📞 撥打電話 ($phoneForDialing)"
+        } else {
+            "📞 撥打電話"
+        }
+        holder.btnPhoneAction.text = displayText
+        holder.btnPhoneAction.setTextColor(Color.parseColor("#4285F4"))
+        holder.btnPhoneAction.backgroundTintList = null
+
+        // 1. 強制攔截點擊事件並由 onAction 統一分派 PHONE_CALL (防止穿透與閃退)
+        holder.btnPhoneAction.isClickable = true
+        holder.btnPhoneAction.isFocusable = true
+        holder.btnPhoneAction.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.PHONE_CALL, card, view)
+        }
+
+        // 2. 確保卡片根布局攔截點擊 (防止點擊卡片空白處穿透到下層)
+        holder.itemView.setOnClickListener { /* 攔截，不做任何動作，防止穿透 */ }
+        holder.itemView.isClickable = true
+        holder.itemView.isFocusable = true
 
         // 8. 下架按鈕
         holder.flDeleteCard.visibility = if (card.isSelfOwner) View.VISIBLE else View.GONE
@@ -360,10 +410,68 @@ class RequirementAdapter(
         }
         holder.tvSwipeHint.startAnimation(swipeAnim)
 
-        // 事件監聽
-        holder.btnGoogleMaps.setOnClickListener { onAction(ActionType.NAVIGATE, card, it) }
-        holder.btnContactAction.setOnClickListener { onAction(ActionType.CONTACT, card, it) }
-        holder.btnDeleteCard.setOnClickListener { onAction(ActionType.DELETE, card, it) }
+        // 事件監聽與點擊防穿透保護
+        val actionButtons = listOf(
+            holder.btnGoogleMaps,
+            holder.btnContactAction,
+            holder.btnPhoneAction,
+            holder.btnExternalLink,
+            holder.btnDeleteCard,
+            holder.btnLikeGroup,
+            holder.btnDislikeGroup,
+            holder.btnRiskControlMenu
+        )
+        actionButtons.forEach { btn ->
+            btn.isClickable = true
+            btn.isFocusable = true
+            btn.setOnTouchListener { v, event ->
+                if (event.action == android.view.MotionEvent.ACTION_UP) {
+                    v.performClick()
+                }
+                true
+            }
+        }
+
+        holder.btnGoogleMaps.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.NAVIGATE, card, view)
+        }
+        holder.btnContactAction.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.CONTACT, card, view)
+        }
+        holder.btnPhoneAction.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.PHONE_CALL, card, view)
+        }
+        holder.btnExternalLink.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.SOCIAL, card, view)
+        }
+        holder.btnDeleteCard.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.DELETE, card, view)
+        }
+        holder.btnLikeGroup.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.LIKE, card, view)
+        }
+        holder.btnDislikeGroup.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.DISLIKE, card, view)
+        }
+        holder.btnRiskControlMenu.setOnClickListener { view ->
+            view.isClickable = true
+            view.isFocusable = true
+            onAction(ActionType.MENU, card, view)
+        }
     }
 
     override fun getItemCount() = cards.size + 1

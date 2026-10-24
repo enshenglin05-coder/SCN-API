@@ -25,6 +25,7 @@
     <string name="cat_9_pet">9. 寵物服務</string>
     <string name="cat_10_service">10. 專業服務</string>
     <string name="cat_11_reserved">11. 公益關懷</string>
+    <string name="cat_12_religion">12. 信仰祈福</string>
 
     <!-- 子項目資源 ID 化 -->
     <string name="sub_item_1_1">在地攤商\n個人私廚</string>
@@ -117,6 +118,24 @@
     <string name="sub_item_10_7">緊急求助\n在地互助</string>
     <string name="sub_item_10_8">綜合服務\n其它幫忙</string>
 
+    <string name="sub_item_11_1">庇護手作\n愛心義賣</string>
+    <string name="sub_item_11_2">物資募集\n舊物捐贈</string>
+    <string name="sub_item_11_3">志工招募\n義工服務</string>
+    <string name="sub_item_11_4">愛心餐食\n待用餐點</string>
+    <string name="sub_item_11_5">浪浪救助\n中途送養</string>
+    <string name="sub_item_11_6">社區關懷\n長者陪伴</string>
+    <string name="sub_item_11_7">義剪義診\n資源援助</string>
+    <string name="sub_item_11_8">環境保護\n淨灘義工</string>
+
+    <string name="sub_item_12_1">土地公\n福德正神</string>
+    <string name="sub_item_12_2">關聖帝君\n恩主公</string>
+    <string name="sub_item_12_3">天上聖母\n媽祖</string>
+    <string name="sub_item_12_4">基督教\n代禱祈禱</string>
+    <string name="sub_item_12_5">佛教感應\n點燈祈福</string>
+    <string name="sub_item_12_6">天主教\n祈禱祈福</string>
+    <string name="sub_item_12_7">心靈平安\n普渡祈福</string>
+    <string name="sub_item_12_8">綜合信仰\n靈修祈福</string>
+
     <!-- zh-TW 在地信仰 -->
     <string name="card_tw_landlord_name">土地公 (福德正神)</string>
     <string name="card_tw_landlord_desc">土地公 福德正神保佑您，祝您財源廣進、生意興隆！</string>
@@ -173,25 +192,27 @@
     <string name="religion_tw_general_title">心靈祝福 (通用)</string>
     <string name="religion_tw_general_desc">願美好的祝福陪伴著您，心想事成、萬事順心！</string>
 
-    <string name="religion_en_christian_title">Christianity</string>
-    <string name="religion_en_christian_desc">May God bless you.</string>
-    <string name="religion_en_catholic_title">Catholicism</string>
-    <string name="religion_en_catholic_desc">May the peace of the Lord be with you.</string>
-    <string name="religion_en_judaism_title">Judaism</string>
-    <string name="religion_en_judaism_desc">May the Almighty guide you.</string>
-    <string name="religion_en_islam_title">Islam</string>
-    <string name="religion_en_islam_desc">May Allah grant you health.</string>
-    <string name="religion_en_general_title">Secular Mindfulness</string>
-    <string name="religion_en_general_desc">May peace be with you.</string>
+    <string name="religion_en_christian_title">Christianity (Church &amp; Prayers)</string>
+    <string name="religion_en_christian_desc">May God’s grace and peace surround you and your family always.</string>
+    <string name="religion_en_catholic_title">Catholicism (Blessings &amp; Grace)</string>
+    <string name="religion_en_catholic_desc">May the peace of the Lord be with you, bringing comfort to your heart.</string>
+    <string name="religion_en_judaism_title">Judaism (Shalom &amp; Blessings)</string>
+    <string name="religion_en_judaism_desc">May you be blessed with peace, health, and divine protection.</string>
+    <string name="religion_en_islam_title">Islam (Faith &amp; Inner Peace)</string>
+    <string name="religion_en_islam_desc">May Allah grant you health, guidance, and unwavering peace of mind.</string>
+    <string name="religion_en_general_title">Secular Mindfulness &amp; Healing</string>
+    <string name="religion_en_general_desc">May you find deep inner peace, emotional balance, and daily well-being.</string>
 
-    <string name="religion_ja_shinto_title">Shinto</string>
-    <string name="religion_ja_shinto_desc">Gokago o.</string>
-    <string name="religion_ja_buddhist_title">Buddhism</string>
-    <string name="religion_ja_buddhist_desc">Annei o.</string>
-    <string name="religion_ja_christian_title">Christianity</string>
-    <string name="religion_ja_christian_desc">Megumi o.</string>
-    <string name="religion_ja_general_title">General</string>
-    <string name="religion_ja_general_desc">Heiva o.</string>
+    <string name="religion_ja_shinto_title" translatable="false">神道（神社参拝・開運）</string>
+    <string name="religion_ja_shinto_desc" translatable="false">ご加護により、家内安全と商売繁盛をお祈り申し上げます。</string>
+    <string name="religion_ja_buddhist_title" translatable="false">仏教（寺院祈願・心願成就）</string>
+    <string name="religion_ja_buddhist_desc" translatable="false">仏様の慈悲により、心身の平穏と安寧が訪れますように。</string>
+    <string name="religion_ja_christian_title" translatable="false">キリスト教（教会・祈り）</string>
+    <string name="religion_ja_christian_desc" translatable="false">神の恵みと平安が、あなたの歩みに満ち溢れますように。</string>
+    <string name="religion_ja_catholic_title" translatable="false">カトリック（祝福・ミサ）</string>
+    <string name="religion_ja_catholic_desc" translatable="false">主の聖なる愛と慈しみが、あなたを優しく包み込みますように。</string>
+    <string name="religion_ja_general_title" translatable="false">心の平穏・癒やし</string>
+    <string name="religion_ja_general_desc" translatable="false">日々の安らぎを取り戻し、健やかな毎日を送れますように。</string>
 
     <string name="religion_ko_protestant_title">Protestant</string>
     <string name="religion_ko_protestant_desc">Blessings.</string>
@@ -215,8 +236,9 @@
     <string name="btn_enter_ui2">確認選擇</string>
     <string name="exit">退出</string>
     <string name="label_rainbow_switch">開啟流彩氛圍燈</string>
+    <string name="ambient_light">開啟流彩氛圍燈</string>
     <string name="error_select_card">請先選擇心靈祝福 / 信仰類別！</string>
-    <string name="distance_setting_prefix">距離設定：</string>
+    <string name="distance_setting_prefix">搜尋距離設定：</string>
     <string name="km_unit">KM</string>
     <string name="dialog_distance_title">設定搜尋距離 (KM)</string>
     <string name="confirm">確定</string>
@@ -229,6 +251,8 @@
     <string name="tab_need">我要需求</string>
     <string name="tab_supply">我要供給</string>
     <string name="hint_description">請輸入詳細需求或服務說明...</string>
+    <string name="hint_social_link">🔗 FB / IG / Threads / X URL...</string>
+    <string name="hint_video_link">🌐 YouTube / TikTok / 網站 URL...</string>
     <string name="label_social_link_hint">請仔細輸入產品網址說明與照片提供說明 (FB/YouTube/抖音/X/Threads 等皆可自行張貼，非必填)</string>
     <string name="hint_social_merged">🔗 自行張貼說明網址 (FB/YT/TikTok/X...)</string>
     <string name="hint_contact_id_specific">請輸入選定通訊軟體之 ID / 帳號</string>
@@ -342,4 +366,26 @@
     <string name="msg_tts_list_updated">已更新周邊卡片列表</string>
     <string name="msg_tts_publish_success">卡片已成功發布</string>
     <string name="msg_tts_fill_required">請填寫必要說明與聯絡方式</string>
+
+    <string name="ai_menu_title">🚀 四大 AI 模態獨立卡片中心</string>
+    <string name="ai_action_header">📌 一鍵操作項目：</string>
+    <string name="ai_action_map">📍 Google Map 位置跳轉</string>
+    <string name="ai_action_photos">🖼️ 社群照片檢視</string>
+    <string name="ai_action_product">📦 產品說明開啟</string>
+    <string name="ai_action_contact">💬 通訊軟體串接 (%1$s)</string>
+    <string name="ai_call_status_direct">📞 支援對話框內直接撥打</string>
+    <string name="ai_call_status_indirect">⚠️ 不支援直接撥打，需複製後再進行撥打</string>
+    <string name="ai_btn_call">📞 直接撥打</string>
+    <string name="ai_btn_copy">📋 複製號碼</string>
+    <string name="ai_btn_jump">🚀 一鍵跳轉</string>
+    <string name="ai_close">關閉</string>
+    <string name="ai_launch_toast">正在啟動 AI 模態選單...</string>
+
+    <string name="lang_select_title">選擇語言</string>
+    <string name="lang_zh">繁體中文</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ja">日本語</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_vi">Tiếng Việt</string>
+    <string name="scroll_hint">上下滑動探索卡片</string>
 </resources>

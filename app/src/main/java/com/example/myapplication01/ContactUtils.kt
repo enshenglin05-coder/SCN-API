@@ -64,10 +64,22 @@ object ContactUtils {
     }
 
     /**
-     * 觸發系統原生撥號盤撥打電話
+     * 觸發系統原生撥號盤撥打電話 (統一電話撥打與防呆規範)
      */
-    fun makePhoneCall(context: Context, phoneNumber: String) {
-        PhoneActionHelper.openDialer(context, phoneNumber)
+    fun makePhoneCall(context: Context, rawPhone: String?) {
+        try {
+            val phone = rawPhone?.trim() ?: ""
+            if (phone.isEmpty() || phone == "null") {
+                Toast.makeText(context.applicationContext, "此卡片未提供有效電話號碼", Toast.LENGTH_SHORT).show()
+                return
+            }
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone")).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.applicationContext.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context.applicationContext, "無法開啟撥號盤", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package com.example.myapplication01
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -15,7 +16,8 @@ import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.LocaleListCompat
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
@@ -33,8 +35,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import android.os.Message
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import com.example.myapplication01.repository.core.MatchingCore
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -55,6 +62,8 @@ class UI3Activity : BaseActivity() {
     private var tabLayoutType: TabLayout? = null
     private var btnBack: ImageButton? = null
     private var btnLocationUI3: TextView? = null
+    private var tvDistanceSetting: TextView? = null
+
     private var tvLiveLocation: TextView? = null
     private var etDetail: EditText? = null
     private var etSocialLink: EditText? = null
@@ -64,8 +73,7 @@ class UI3Activity : BaseActivity() {
     private var rbTelegram: RadioButton? = null
     private var rbWechat: RadioButton? = null
     private var etContactId: EditText? = null
-    private var btnClearDraft: TextView? = null
-    private var btnSaveDraft: TextView? = null
+
     private var btnRefreshList: Button? = null
     private var tvCharCount: TextView? = null
     private var btnPublish: Button? = null
@@ -74,13 +82,15 @@ class UI3Activity : BaseActivity() {
 
     private var filteredCards = mutableListOf<RequirementCard>() 
     
-    private var isCountingDown = false
     private var userLat: Double? = null
     private var userLng: Double? = null
     private var limitDistanceKm: Double = 50.0 
     
     private lateinit var currentDeviceId: String
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val okHttpClient = okhttp3.OkHttpClient()
+
+
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -240,6 +250,12 @@ class UI3Activity : BaseActivity() {
         }
 
         enableEdgeToEdge()
+        
+        // 確保從 UIE/GlobalState 同步當前語系
+        val langCode = GlobalState.selectedLanguageCode
+        val appLocale = LocaleListCompat.forLanguageTags(langCode)
+        AppCompatDelegate.setApplicationLocales(appLocale)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_ui3)
 
@@ -275,6 +291,13 @@ class UI3Activity : BaseActivity() {
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayoutUI3)
         swipeRefreshLayout?.setOnRefreshListener {
             applyFilterAndRefresh()
+            try {
+                lifecycleScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                    DeityBlessingTTS.speakCurrentBlessing(applicationContext)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("UI3_TTS", "TTS 祝福語音播放異常: ${e.message}")
+            }
         }
 
         applyFilterAndRefresh()
@@ -332,211 +355,94 @@ class UI3Activity : BaseActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
+                // 語言工具箱
                 RainbowBorderWrapper(
                     modifier = Modifier
-                        .width(160.dp)
+                        .width(100.dp)
                         .height(38.dp),
                     cornerRadius = 8.dp,
                     borderWidth = 2.2.dp
                 ) {
                     Button(
-                        onClick = { sendPayloadToGemini() },
+                        onClick = { showLanguageSelector() },
                         colors = ButtonDefaults.buttonColors(containerColor = ComposeColor.Transparent),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("📋 一鍵打包", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = ComposeColor.White)
+                        val langLabel = when (GlobalState.selectedLanguageCode) {
+                            "en" -> "English"
+                            "ja" -> "日本語"
+                            "ko" -> "한국어"
+                            "vi" -> "Tiếng Việt"
+                            else -> "繁體中文"
+                        }
+                        Text(langLabel, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ComposeColor.White)
                     }
                 }
-
+                
+                // AI 啟動按鍵
                 RainbowBorderWrapper(
                     modifier = Modifier
-                        .width(160.dp)
+                        .width(120.dp)
                         .height(38.dp),
                     cornerRadius = 8.dp,
                     borderWidth = 2.2.dp
                 ) {
                     Button(
-                        onClick = { launchAIPublish() },
+                        onClick = {
+                            android.util.Log.d("AiButton", "Sticky Header AI 發布按鈕被點擊 (UI3)")
+                            Toast.makeText(this@UI3Activity, getString(R.string.ai_launch_toast), Toast.LENGTH_SHORT).show()
+                            AiModalityDialogManager.showAiModalitiesMenu(this@UI3Activity)
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = ComposeColor.Transparent),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("🚀 AI 發布", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = ComposeColor.White)
+                        val aiBtnText = when (GlobalState.selectedLanguageCode) {
+                            "en" -> "🚀 AI Publish"
+                            "ja" -> "🚀 AI 発行"
+                            "ko" -> "🚀 AI 발행"
+                            "vi" -> "🚀 Đăng AI"
+                            else -> "🚀 AI 發布"
+                        }
+                        Text(aiBtnText, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = ComposeColor.White)
                     }
                 }
             }
         }
     }
 
-    private fun generateDrawerDataPayload(): String? {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val sourceList = filteredCards
-        
-        if (sourceList.isEmpty()) {
-            Toast.makeText(this, "當前頁面無卡片數據可打包", Toast.LENGTH_SHORT).show()
-            return null
-        }
-
-        val mappedCards = sourceList.mapIndexed { index, card ->
-            val cardIndex = index + 1
-            val cardTag = String.format(Locale.getDefault(), "#%02d", cardIndex)
-            val dist = if (userLat != null && userLng != null) {
-                DistanceUtils.calculateDistance(userLat!!, userLng!!, card.gps_lat, card.gps_lng)
-            } else 0.0
-            
-            val cleanVal = ContactUtils.cleanContactValue(card.contact_value)
-            val phoneVal = (card.phone_number ?: if (card.contact_method == RequirementCard.ContactMethod.PHONE) card.contact_value else null)
-                ?.let { ContactUtils.cleanPhoneNumber(ContactUtils.cleanContactValue(it)) }
-                ?.ifEmpty { null }
-
-            val (contactLabel, contactDisplay, contactLink) = when (card.contact_method) {
-                RequirementCard.ContactMethod.PHONE -> Triple(
-                    "💬 撥打電話/簡訊",
-                    if (cleanVal.isNotEmpty()) "[💬 撥打電話/簡訊 ($cleanVal)](tel:$cleanVal)" else "無",
-                    if (cleanVal.isNotEmpty()) "tel:$cleanVal" else null
-                )
-                RequirementCard.ContactMethod.WECHAT -> Triple(
-                    "💬 WeChat ID",
-                    if (cleanVal.isNotEmpty()) "💬 WeChat ID (微信: $cleanVal)" else "無",
-                    null
-                )
-                RequirementCard.ContactMethod.LINE -> Triple(
-                    "💬 LINE ID",
-                    if (cleanVal.isNotEmpty()) "[💬 LINE ID ($cleanVal)](https://line.me/ti/p/~$cleanVal)" else "無",
-                    if (cleanVal.isNotEmpty()) "https://line.me/ti/p/~$cleanVal" else null
-                )
-                RequirementCard.ContactMethod.TELEGRAM -> Triple(
-                    "💬 Telegram",
-                    if (cleanVal.isNotEmpty()) "[💬 Telegram ($cleanVal)](https://t.me/$cleanVal)" else "無",
-                    if (cleanVal.isNotEmpty()) "https://t.me/$cleanVal" else null
-                )
-            }
-
-            val phoneDisplay = if (!phoneVal.isNullOrEmpty()) "[📞 電話 ($phoneVal)](tel:$phoneVal)" else "無"
-
-            mapOf(
-                "idx" to cardTag,
-                "card_index" to cardIndex,
-                "id" to card.card_id,
-                "did" to card.category_code,
-                "t" to CategoryRepository.getCategoryTitle(card.category_code),
-                "dist" to String.format(Locale.getDefault(), "%.2fkm", dist),
-                "lat" to card.gps_lat,
-                "lng" to card.gps_lng,
-                "time" to sdf.format(Date(card.created_at)),
-                "desc" to card.description,
-                "url" to card.media_url,
-                "contact" to mapOf(
-                    "method" to card.contact_method.name,
-                    "label" to contactLabel,
-                    "val" to cleanVal,
-                    "display" to contactDisplay,
-                    "link" to contactLink,
-                    "phone" to phoneVal,
-                    "phone_display" to phoneDisplay
-                )
-            )
-        }
-
-        val jsonStr = com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(mappedCards)
-        return "$SYSTEM_PROTOCOL_WRAPPER\n$jsonStr"
-    }
-
-    private fun sendPayloadToGemini() {
-        val finalPayload = generateDrawerDataPayload() ?: return
-
-        // 不使用 Clipboard 寫入剪貼簿，避免觸發 Android 隱私權限/剪貼簿警告彈窗
-        // 直接以 ACTION_SEND (Intent.EXTRA_TEXT) 發送給 Gemini App (com.google.android.apps.bard)
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, finalPayload)
-            setPackage("com.google.android.apps.bard")
-        }
-
-        if (shareIntent.resolveActivity(packageManager) != null) {
-            startActivity(shareIntent)
-        } else {
-            // 備援 1: 嘗試啟動 Gemini Native App
-            val launchIntent = packageManager.getLaunchIntentForPackage("com.google.android.apps.bard")
-            if (launchIntent != null) {
-                startActivity(launchIntent)
-            } else {
-                // 備援 2: 開啟系統通用分享選單 (完全不觸碰剪貼簿)
-                val chooserIntent = Intent.createChooser(
-                    Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, finalPayload)
-                    },
-                    "選擇發送 Prompt 之應用程式"
-                )
-                startActivity(chooserIntent)
-            }
-        }
-    }
-
-    /**
-     * 【AI 發布】獨立系統端邏輯：
-     * 1. 徹底隔離既有卡片數據，絕不讀取或分析 filteredCards。
-     * 2. 複製 UI3 純空白發布架構，帶入已確定 GPS 座標、抽屜身份 Context 與空白 JSON 底紙。
-     * 3. 攜帶 Context 與空白底紙跳轉 Gemini，由 Gemini 作為 AI 發布編譯引擎輔助使用者填寫與生成 JSON。
-     */
-    private fun launchAIPublish() {
-        val currentType = if (tabLayoutType?.selectedTabPosition == 0) MatchingCore.TYPE_A_DEMAND else MatchingCore.TYPE_B_SUPPLY
-        val typeLabel = if (currentType == MatchingCore.TYPE_A_DEMAND) "1A: 剛需尋求/買家需求" else "1B: 服務提供/賣家供給"
-        val targetCatId = catId ?: "1-1"
-        val targetCatName = catName ?: CategoryRepository.getCategoryTitle(targetCatId)
-        val lat = userLat ?: GlobalState.globalLatitude ?: 0.0
-        val lng = userLng ?: GlobalState.globalLongitude ?: 0.0
-        val now = System.currentTimeMillis()
-        val tempCardId = generateCardId(currentType)
-        val themeColor = GlobalState.selectedThemeColorHex
-
-        val finalPayload = String.format(
-            Locale.getDefault(),
-            AI_PUBLISH_PROTOCOL_WRAPPER,
-            targetCatId,
-            targetCatName,
-            currentType,
-            typeLabel,
-            lat,
-            lng,
-            currentDeviceId,
-            tempCardId,
-            currentDeviceId,
-            now,
-            targetCatId,
-            currentType,
-            lat,
-            lng,
-            themeColor
+    private fun showLanguageSelector() {
+        val languages = arrayOf(
+            getString(R.string.lang_zh),
+            getString(R.string.lang_en),
+            getString(R.string.lang_ja),
+            "한국어",
+            "Tiếng Việt"
         )
-
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, finalPayload)
-            setPackage("com.google.android.apps.bard")
-        }
-
-        if (shareIntent.resolveActivity(packageManager) != null) {
-            startActivity(shareIntent)
-        } else {
-            val launchIntent = packageManager.getLaunchIntentForPackage("com.google.android.apps.bard")
-            if (launchIntent != null) {
-                startActivity(launchIntent)
-            } else {
-                val chooserIntent = Intent.createChooser(
-                    Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, finalPayload)
-                    },
-                    "選擇發送 AI 發布之應用程式"
-                )
-                startActivity(chooserIntent)
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.lang_select_title))
+            .setItems(languages) { _, which ->
+                val localeCode = when (which) {
+                    1 -> "en"
+                    2 -> "ja"
+                    3 -> "ko"
+                    4 -> "vi"
+                    else -> "zh-TW"
+                }
+                GlobalState.selectedLanguageCode = localeCode
+                
+                val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(localeCode)
+                AppCompatDelegate.setApplicationLocales(appLocale)
+                
+                // 重新整理 UI 與對應 TTS 語系，並更新 Sticky Header
+                applyGlobalTheme()
+                applyFilterAndRefresh()
+                setupStickyHeader() 
             }
-        }
+            .show()
     }
 
     private var draftWatcher: TextWatcher? = null
@@ -546,6 +452,8 @@ class UI3Activity : BaseActivity() {
         tabLayoutType = view.findViewById(R.id.tabLayoutPostType)
         btnBack = view.findViewById(R.id.btnBackUI3)
         btnLocationUI3 = view.findViewById(R.id.btnLocationUI3)
+        tvDistanceSetting = view.findViewById(R.id.tvDistanceSetting)
+
         tvLiveLocation = view.findViewById(R.id.tvLiveLocation)
         etDetail = view.findViewById(R.id.etPostDetail)
         etSocialLink = view.findViewById(R.id.etSocialLink)
@@ -555,8 +463,7 @@ class UI3Activity : BaseActivity() {
         rbTelegram = view.findViewById(R.id.rbTelegram)
         rbWechat = view.findViewById(R.id.rbWechat)
         etContactId = view.findViewById(R.id.etContactId)
-        btnClearDraft = view.findViewById(R.id.btnClearDraft)
-        btnSaveDraft = view.findViewById(R.id.btnSaveDraft)
+
         btnRefreshList = view.findViewById(R.id.btnRefreshList)
         tvCharCount = view.findViewById(R.id.tvCharCount)
         btnPublish = view.findViewById(R.id.btnPublish)
@@ -570,55 +477,71 @@ class UI3Activity : BaseActivity() {
         tabLayoutType?.getTabAt(0)?.text = getString(R.string.tab_need)
         tabLayoutType?.getTabAt(1)?.text = getString(R.string.tab_supply)
         
+        btnPublish?.text = getString(R.string.btn_publish_text)
+        btnRefreshList?.text = getString(R.string.btn_refresh_list)
+        etDetail?.hint = getString(R.string.hint_description)
+        etSocialLink?.hint = getString(R.string.hint_social_link)
+        etContactId?.hint = getString(R.string.hint_contact_id)
+        tvScrollHint?.text = getString(R.string.scroll_hint)
+
         updatePublishLocationButton()
-        loadDraft()
+        updateDistanceText()
+        // 移除草稿載入機制，確保開啟時為最乾淨初始狀態
         applyGlobalTheme()
         setupListeners()
         setupRainbowBordersForPublish(view)
     }
 
     private fun handleCardAction(action: RequirementAdapter.ActionType, card: RequirementCard, anchorView: View?) {
-        when (action) {
-            RequirementAdapter.ActionType.NAVIGATE -> MapUtils.openGoogleMaps(this, card.gps_lat, card.gps_lng, card.category_tag)
-            RequirementAdapter.ActionType.CONTACT -> {
-                handleContactIntent(card.contact_method, card.contact_value)
-            }
-            RequirementAdapter.ActionType.PHONE_CALL -> {
-                val phoneToDial = card.phone_number ?: if (card.contact_method == RequirementCard.ContactMethod.PHONE) card.contact_value else null
-                PhoneActionHelper.openDialer(this, phoneToDial)
-            }
-            RequirementAdapter.ActionType.SOCIAL -> card.media_url?.let { openExternalUrl(it) }
-            RequirementAdapter.ActionType.DELETE -> {
-                val cardId = card.card_id
-                BaichuanRepository.removeCard(cardId, {
-                    runOnUiThread {
-                        val pos = filteredCards.indexOfFirst { it.card_id == cardId }
-                        if (pos != -1) {
-                            filteredCards.removeAt(pos)
-                            adapter?.notifyItemRemoved(pos + 1) // +1 因為有 Header
-                            adapter?.notifyItemRangeChanged(pos + 1, filteredCards.size)
+        lifecycleScope.launch(NonCancellable) {
+            when (action) {
+                RequirementAdapter.ActionType.NAVIGATE -> MapUtils.openGoogleMapsForCard(this@UI3Activity, card)
+                RequirementAdapter.ActionType.CONTACT -> {
+                    handleContactIntent(card.contact_method, card.contact_value)
+                }
+                RequirementAdapter.ActionType.PHONE_CALL -> {
+                    val phoneNum = card.getPhoneForDialing()
+                    makePhoneCall(this@UI3Activity, phoneNum)
+                }
+                RequirementAdapter.ActionType.SOCIAL -> card.media_url?.let { openExternalUrl(it) }
+                RequirementAdapter.ActionType.DELETE -> {
+                    val cardId = card.card_id
+                    BaichuanRepository.removeCard(cardId, {
+                        runOnUiThread {
+                            val pos = filteredCards.indexOfFirst { it.card_id == cardId }
+                            if (pos != -1) {
+                                filteredCards.removeAt(pos)
+                                adapter?.notifyItemRemoved(pos + 1) // +1 因為有 Header
+                                adapter?.notifyItemRangeChanged(pos + 1, filteredCards.size)
+                            }
+                            Toast.makeText(this@UI3Activity, getString(R.string.msg_unpublish_success), Toast.LENGTH_SHORT).show()
                         }
-                        Toast.makeText(this, getString(R.string.msg_unpublish_success), Toast.LENGTH_SHORT).show()
-                    }
-                }, { error ->
+                    }, { error ->
+                        runOnUiThread {
+                            Toast.makeText(this@UI3Activity, "下架失敗: $error", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                }
+                RequirementAdapter.ActionType.MENU -> runOnUiThread { showReportBottomSheet(card) }
+                RequirementAdapter.ActionType.LIKE -> {
+                    val (newUp, newDown) = VoteManager.onUpVoteClicked(this@UI3Activity, card.card_id, card.like_count, card.dislike_count)
+                    BaichuanRepository.updateVoteCounts(card.card_id, newUp, newDown)
+                    runOnUiThread { applyFilterAndRefresh() }
+                }
+                RequirementAdapter.ActionType.DISLIKE -> {
+                    val (newUp, newDown) = VoteManager.onDownVoteClicked(this@UI3Activity, card.card_id, card.like_count, card.dislike_count)
+                    BaichuanRepository.updateVoteCounts(card.card_id, newUp, newDown)
+                    runOnUiThread { applyFilterAndRefresh() }
+                }
+                RequirementAdapter.ActionType.PACK -> { /* 絕對不做任何事情，保持乾淨 */ }
+                RequirementAdapter.ActionType.AI -> {
+                    android.util.Log.d("AiButton", "Card Header 啟動AI按鈕被點擊 (UI3)")
                     runOnUiThread {
-                        Toast.makeText(this, "下架失敗: $error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@UI3Activity, "正在啟動 AI 模態選單...", Toast.LENGTH_SHORT).show()
+                        AiModalityDialogManager.showAiModalitiesMenu(this@UI3Activity)
                     }
-                })
+                }
             }
-            RequirementAdapter.ActionType.MENU -> showReportBottomSheet(card)
-            RequirementAdapter.ActionType.LIKE -> {
-                val (newUp, newDown) = VoteManager.onUpVoteClicked(this, card.card_id, card.like_count, card.dislike_count)
-                BaichuanRepository.updateVoteCounts(card.card_id, newUp, newDown)
-                applyFilterAndRefresh()
-            }
-            RequirementAdapter.ActionType.DISLIKE -> {
-                val (newUp, newDown) = VoteManager.onDownVoteClicked(this, card.card_id, card.like_count, card.dislike_count)
-                BaichuanRepository.updateVoteCounts(card.card_id, newUp, newDown)
-                applyFilterAndRefresh()
-            }
-            RequirementAdapter.ActionType.PACK -> sendPayloadToGemini()
-            RequirementAdapter.ActionType.AI -> launchAIPublish()
         }
     }
 
@@ -637,11 +560,7 @@ class UI3Activity : BaseActivity() {
             et.compoundDrawablesRelative.forEach { it?.setTint(accentColor) }
         }
         
-        val ghostButtons = listOfNotNull(btnSaveDraft, btnClearDraft)
-        ghostButtons.forEach { btn ->
-            btn.setTextColor(accentColor)
-            btn.background?.setTintList(android.content.res.ColorStateList.valueOf(accentColor).withAlpha(128))
-        }
+
         
         btnRefreshList?.setTextColor(textColor)
         btnRefreshList?.background?.setTintList(android.content.res.ColorStateList.valueOf(accentColor))
@@ -650,8 +569,9 @@ class UI3Activity : BaseActivity() {
         btnPublish?.setTextColor(Color.WHITE) 
         btnPublish?.background?.setTintList(null) 
         btnPublish?.compoundDrawablesRelative?.forEach { it?.setTint(Color.WHITE) }
-        btnPublish?.isEnabled = !isCountingDown
+        btnPublish?.isEnabled = true
         btnPublish?.alpha = 1.0f
+        btnPublish?.bringToFront()
         
         tabLayoutType?.setSelectedTabIndicatorColor(primaryColor)
         tabLayoutType?.setTabTextColors(textColor and 0x66FFFFFF.toInt(), primaryColor)
@@ -685,7 +605,7 @@ class UI3Activity : BaseActivity() {
             R.id.cvBorderTab, R.id.cvBorderDesc, R.id.cvBorderSocial,
             R.id.cvBorderLine, R.id.cvBorderPhonePlatform, R.id.cvBorderTelegram, R.id.cvBorderWechat,
             R.id.cvBorderContactId, R.id.cvBorderPhone,
-            R.id.cvBorderClear, R.id.cvBorderSave,
+
             R.id.cvBorderRefresh, R.id.cvBorderPublish
         )
         
@@ -693,6 +613,7 @@ class UI3Activity : BaseActivity() {
             view.findViewById<ComposeView>(id)?.apply {
                 isClickable = false
                 isFocusable = false
+                visibility = View.VISIBLE
                 setContent {
                     val cornerRadius = if (id == R.id.cvBorderDesc) 16.dp else 24.dp
                     RainbowBorderWrapper(
@@ -703,8 +624,10 @@ class UI3Activity : BaseActivity() {
                 }
             }
         }
-    }
 
+        btnPublish?.bringToFront()
+        btnRefreshList?.bringToFront()
+    }
 
     private fun handleWindowInsets() {
         val stickyHeader = findViewById<ComposeView>(R.id.cvStickyGeminiHeader)
@@ -770,8 +693,20 @@ class UI3Activity : BaseActivity() {
         bottomSheetDialog.show()
     }
 
-    private fun makePhoneCall(phoneNumber: String) {
-        PhoneActionHelper.openDialer(this, phoneNumber)
+    private fun makePhoneCall(context: Context, rawPhone: String?) {
+        try {
+            val phone = rawPhone?.trim() ?: ""
+            if (phone.isEmpty() || phone == "null") {
+                Toast.makeText(context.applicationContext, "此卡片未提供有效電話號碼", Toast.LENGTH_SHORT).show()
+                return
+            }
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone")).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.applicationContext.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context.applicationContext, "無法開啟撥號盤", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun handleContactIntent(method: RequirementCard.ContactMethod, value: String) {
@@ -779,24 +714,41 @@ class UI3Activity : BaseActivity() {
         when (method) {
             RequirementCard.ContactMethod.LINE -> {
                 try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://line.me/ti/p/~$cleanVal")))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://line.me/ti/p/~$cleanVal")).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    startActivity(intent)
                 } catch (e: Exception) {
-                    ContactUtils.copyToClipboard(this, cleanVal)
-                    Toast.makeText(this, getString(R.string.error_line_jump), Toast.LENGTH_SHORT).show()
+                    try {
+                        val lineSchemeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("line://ti/p/~$cleanVal")).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(lineSchemeIntent)
+                    } catch (_: Exception) {
+                        ContactUtils.copyToClipboard(this, cleanVal)
+                        Toast.makeText(this, "無法開啟 LINE，已複製 LINE ID: $cleanVal", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-            RequirementCard.ContactMethod.TELEGRAM -> try { 
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$cleanVal"))) 
-            } catch (e: Exception) { 
-                ContactUtils.copyToClipboard(this, cleanVal)
-                Toast.makeText(this, "已複製 Telegram 帳號: $cleanVal", Toast.LENGTH_SHORT).show() 
+            RequirementCard.ContactMethod.TELEGRAM -> {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$cleanVal")).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    ContactUtils.copyToClipboard(this, cleanVal)
+                    Toast.makeText(this, "無法開啟 Telegram，已複製帳號: $cleanVal", Toast.LENGTH_SHORT).show()
+                }
             }
-            RequirementCard.ContactMethod.WECHAT -> { 
+            RequirementCard.ContactMethod.WECHAT -> {
                 ContactUtils.copyToClipboard(this, cleanVal)
                 Toast.makeText(this, getString(R.string.msg_wechat_copy), Toast.LENGTH_SHORT).show()
-                ContactUtils.openApp(this, "com.tencent.mm") 
+                try {
+                    ContactUtils.openApp(this, "com.tencent.mm")
+                } catch (_: Exception) {}
             }
-            RequirementCard.ContactMethod.PHONE -> makePhoneCall(cleanVal)
+            RequirementCard.ContactMethod.PHONE -> makePhoneCall(this, cleanVal)
         }
     }
 
@@ -831,13 +783,19 @@ class UI3Activity : BaseActivity() {
         }
         btnBack?.setOnClickListener { finish() }
         btnLocationUI3?.setOnClickListener { checkPermissionAndFetchLocation() }
-        btnClearDraft?.setOnClickListener { showClearDraftDialog() }
-        btnSaveDraft?.setOnClickListener { saveDraft(); Toast.makeText(this, getString(R.string.msg_draft_saved), Toast.LENGTH_SHORT).show() }
+        tvDistanceSetting?.setOnClickListener { showDistancePickerDialog() }
+
         btnRefreshList?.setOnClickListener {
             android.util.Log.d("CardRefresh", "手動觸發刷新列表，距離設定: ${limitDistanceKm}km")
             LocationFlowManager.onRefreshListClicked(this) {
                 applyFilterAndRefresh()
-                DeityBlessingTTS.speakCurrentBlessing(this)
+                try {
+                    lifecycleScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                        DeityBlessingTTS.speakCurrentBlessing(applicationContext)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("UI3_TTS", "TTS 祝福語音播放異常: ${e.message}")
+                }
                 Toast.makeText(this, getString(R.string.btn_refresh_list), Toast.LENGTH_SHORT).show()
             }
         }
@@ -853,7 +811,6 @@ class UI3Activity : BaseActivity() {
         draftWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                saveDraft()
                 val len = s?.length ?: 0
                 tvCharCount?.text = "( $len / 100 )"
                 tvCharCount?.setTextColor(if (len >= 120) Color.RED else if (len > 100) Color.parseColor("#FFA500") else Color.parseColor("#888888"))
@@ -870,27 +827,37 @@ class UI3Activity : BaseActivity() {
             rb.setOnClickListener {
                 radioButtons.forEach { other -> if (other != rb) other.isChecked = false }
                 rb.isChecked = true
-                saveDraft()
             }
         }
+        btnPublish?.bringToFront()
         btnPublish?.setOnClickListener {
-            LocationFlowManager.autoFetchLocationOnFirstPublish(this) { (lat, lng) ->
-                userLat = lat
-                userLng = lng
-                GlobalState.globalLatitude = lat
-                GlobalState.globalLongitude = lng
-                GlobalState.isLocated = true
-                runOnUiThread {
-                    val latStr = String.format(Locale.getDefault(), "%.6f", lat)
-                    val lngStr = String.format(Locale.getDefault(), "%.6f", lng)
-                    tvLiveLocation?.text = getString(R.string.label_gps_coords, latStr, lngStr)
-                    tvLiveLocation?.visibility = View.VISIBLE
-                    updatePublishLocationButton()
-                    if (validateInput()) { startCountdown(); addPost() } 
-                    else DeityBlessingTTS.speak(getString(R.string.msg_tts_fill_required))
-                }
-            }
+            android.util.Log.e("UI3_Click", "=== 立即發布按鈕被點擊了 ===")
+            android.util.Log.d("UI3_Publish", "=== 點擊發布按鈕 ===")
+            publish()
         }
+    }
+
+    private fun showDistancePickerDialog() {
+        val picker = NumberPicker(this).apply {
+            minValue = 1
+            maxValue = 50 // 最大上限設為 50 KM
+            value = limitDistanceKm.toInt()
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_distance_title))
+            .setView(picker)
+            .setPositiveButton(getString(R.string.confirm)) { _, _ ->
+                limitDistanceKm = picker.value.toDouble()
+                updateDistanceText()
+                applyFilterAndRefresh()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
+    private fun updateDistanceText() {
+        tvDistanceSetting?.text = "${getString(R.string.distance_setting_prefix)}${limitDistanceKm.toInt()} ${getString(R.string.km_unit)}"
     }
 
     private fun checkPermissionAndFetchLocation() {
@@ -984,26 +951,18 @@ class UI3Activity : BaseActivity() {
         swipeRefreshLayout?.isRefreshing = false
     }
 
-    private fun validateInput(): Boolean {
-        if (!(userLat != null && userLng != null && userLat != 0.0 && userLng != 0.0)) { Toast.makeText(this, getString(R.string.error_no_location_publish), Toast.LENGTH_SHORT).show(); return false }
-        if (etContactId?.text.isNullOrBlank()) { Toast.makeText(this, getString(R.string.error_empty_contact_publish), Toast.LENGTH_SHORT).show(); return false }
-        if (etDetail?.text.isNullOrBlank()) { Toast.makeText(this, getString(R.string.error_empty_description_publish), Toast.LENGTH_SHORT).show(); return false }
-        return true
-    }
-
-    private fun startCountdown() {
-        if (isCountingDown) return
-        isCountingDown = true
-        btnPublish?.isEnabled = false
-        object : CountDownTimer(60000, 1000) {
-            override fun onTick(millis: Long) { btnPublish?.text = getString(R.string.label_publish_success_countdown, (millis / 1000).toInt()) }
-            override fun onFinish() { btnPublish?.text = getString(R.string.btn_publish_text); btnPublish?.isEnabled = true; isCountingDown = false }
-        }.start()
-    }
-
     private fun generateCardId(type: String): String = "$type-${SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())}-${(1..8).map { (('A'..'Z') + ('0'..'9')).random() }.joinToString("")}"
 
-    private fun addPost() {
+    private fun publish() {
+        if (userLat == null || userLng == null || userLat == 0.0 || userLng == 0.0) {
+            Toast.makeText(this, getString(R.string.error_no_location_publish), Toast.LENGTH_SHORT).show()
+            DeityBlessingTTS.speak(this, getString(R.string.error_no_location_publish))
+            return
+        }
+
+        val contactVal = etContactId?.text?.toString()?.trim() ?: ""
+        val phoneVal = etPhoneNumber?.text?.toString()?.trim() ?: ""
+
         val selectedMethod = when {
             rbLine?.isChecked == true -> RequirementCard.ContactMethod.LINE
             rbPhonePlatform?.isChecked == true -> RequirementCard.ContactMethod.PHONE
@@ -1011,98 +970,99 @@ class UI3Activity : BaseActivity() {
             rbWechat?.isChecked == true -> RequirementCard.ContactMethod.WECHAT
             else -> RequirementCard.ContactMethod.LINE
         }
-        val currentType = if (tabLayoutType?.selectedTabPosition == 0) MatchingCore.TYPE_A_DEMAND else MatchingCore.TYPE_B_SUPPLY
+
+        val effectiveContactVal = if (selectedMethod == RequirementCard.ContactMethod.PHONE) {
+            phoneVal.ifBlank { contactVal }
+        } else {
+            contactVal
+        }
+
+        if (effectiveContactVal.isBlank()) {
+            Toast.makeText(this, getString(R.string.error_empty_contact_publish), Toast.LENGTH_SHORT).show()
+            DeityBlessingTTS.speak(this, getString(R.string.msg_tts_fill_required))
+            return
+        }
+
+        val detailText = etDetail?.text?.toString()?.trim() ?: ""
+        if (detailText.isBlank()) {
+            Toast.makeText(this, getString(R.string.error_empty_description_publish), Toast.LENGTH_SHORT).show()
+            DeityBlessingTTS.speak(this, getString(R.string.msg_tts_fill_required))
+            return
+        }
+
         val targetCatId = catId ?: "1-1"
-        
-        val newCard = RequirementCard(
-            card_id = generateCardId(currentType),
+        val targetCatName = catName ?: CategoryRepository.getCategoryTitle(targetCatId)
+        val currentType = if (tabLayoutType?.selectedTabPosition == 0) "1A" else "1B"
+        val cardId = generateCardId(currentType)
+        val lat = userLat ?: 0.0
+        val lng = userLng ?: 0.0
+
+        val finalPhoneNum = if (selectedMethod == RequirementCard.ContactMethod.PHONE) {
+            phoneVal.ifBlank { contactVal }
+        } else {
+            phoneVal
+        }
+        val cleanedPhone = finalPhoneNum.takeIf { it.isNotBlank() }?.let { PhoneActionHelper.cleanPhoneNumber(it) }
+
+        val card = RequirementCard(
+            card_id = cardId,
             publisher_device_id = currentDeviceId,
             created_at = System.currentTimeMillis(),
             category_code = targetCatId,
             drawer_type = currentType,
-            description = etDetail?.text.toString(),
-            media_url = etSocialLink?.text.toString().takeIf { it.isNotEmpty() },
+            category_tag = targetCatName,
+            description = detailText,
+            media_url = etSocialLink?.text?.toString()?.trim()?.takeIf { it.isNotBlank() }?.let { PhoneActionHelper.sanitizeUrl(it) },
             contact_method = selectedMethod,
-            contact_value = etContactId?.text.toString(),
-            phone_number = etPhoneNumber?.text.toString().takeIf { it.isNotEmpty() },
-            gps_lat = userLat ?: 0.0,
-            gps_lng = userLng ?: 0.0,
-            isSelfOwner = true,
-            theme_color = GlobalState.selectedThemeColorHex
+            contact_value = effectiveContactVal,
+            phone_number = cleanedPhone ?: if (selectedMethod == RequirementCard.ContactMethod.PHONE) effectiveContactVal else null,
+            gps_lat = lat,
+            gps_lng = lng,
+            mapUrl = "https://www.google.com/maps/search/?api=1&query=$lat,$lng",
+            theme_color = GlobalState.selectedThemeColorHex,
+            reportCount = 0,
+            errorCount = 0
         )
+
+        // 1. 發布卡片至本地倉儲
         BaichuanRepository.addOrUpdateCard(
-            newCard,
+            card,
             onSuccess = {
-                runOnUiThread {
-                    Toast.makeText(this, "✅ 雲端 SCN-API 數據對接暨儲存成功！", Toast.LENGTH_SHORT).show()
-                    applyFilterAndRefresh()
-                }
+                android.util.Log.d("UI3_Publish", "✅ 雲端發送/寫入成功 (PUT 200/201)")
             },
             onError = { error ->
-                runOnUiThread {
-                    Toast.makeText(this, "⚠️ 本地已儲存，雲端同步警示: $error", Toast.LENGTH_LONG).show()
-                }
+                android.util.Log.e("UI3_Publish", "❌ 雲端發送/寫入失敗: $error")
             }
         )
-        
-        GlobalState.flashTrigger = System.currentTimeMillis()
-        DeityBlessingTTS.speak("已更新，區域驗證中")
-        
+
+        // 2. 立即刷新 UI 列表，呈現剛發布之卡片與對應跳轉按鈕
         applyFilterAndRefresh()
-        speakBlessing()
+
+        // 3. 發布成功後立即重置與清空介面 (清空說明、網址、電話、聯絡方式 ID 與重設預設選項)
+        etDetail?.text?.clear()
+        etSocialLink?.text?.clear()
+        etPhoneNumber?.text?.clear()
+        etContactId?.text?.clear()
+        rbLine?.isChecked = true
+        rbPhonePlatform?.isChecked = false
+        rbTelegram?.isChecked = false
+        rbWechat?.isChecked = false
         clearDraft()
-        etDetail?.text?.clear(); etSocialLink?.text?.clear(); etContactId?.text?.clear()
         Toast.makeText(this, getString(R.string.msg_publish_success), Toast.LENGTH_SHORT).show()
+
+        // 4. 立即觸發與 UI1 對接之神明祝福 TTS 語音播報
+        speakBlessing()
     }
 
-    private fun speakBlessing() = DeityBlessingTTS.speakCurrentBlessing(this)
-
-    private fun saveDraft() {
-        val selectedMethod = when {
-            rbLine?.isChecked == true -> RequirementCard.ContactMethod.LINE
-            rbPhonePlatform?.isChecked == true -> RequirementCard.ContactMethod.PHONE
-            rbTelegram?.isChecked == true -> RequirementCard.ContactMethod.TELEGRAM
-            rbWechat?.isChecked == true -> RequirementCard.ContactMethod.WECHAT
-            else -> RequirementCard.ContactMethod.LINE
-        }
-        getSharedPreferences("PublishDraft", MODE_PRIVATE).edit().apply {
-            putString("detail", etDetail?.text.toString())
-            putString("social", etSocialLink?.text.toString())
-            putString("phone", etPhoneNumber?.text.toString())
-            putString("contact_method", selectedMethod.name)
-            putString("contact_value", etContactId?.text.toString())
-            apply()
-        }
-    }
-
-    private fun loadDraft() {
-        val prefs = getSharedPreferences("PublishDraft", MODE_PRIVATE)
-        val detail = prefs.getString("detail", "") ?: ""
-        val social = prefs.getString("social", "") ?: ""
-        val phone = prefs.getString("phone", "") ?: ""
-        val platform = prefs.getString("contact_method", "LINE") ?: "LINE"
-        val contactValue = prefs.getString("contact_value", "") ?: ""
-        if (detail.isNotEmpty() || social.isNotEmpty() || phone.isNotEmpty() || contactValue.isNotEmpty()) {
-            etDetail?.setText(detail); etSocialLink?.setText(social); etPhoneNumber?.setText(phone); etContactId?.setText(contactValue)
-            when (platform) {
-                "LINE" -> { rbLine?.isChecked = true; rbPhonePlatform?.isChecked = false; rbTelegram?.isChecked = false; rbWechat?.isChecked = false }
-                "PHONE" -> { rbLine?.isChecked = false; rbPhonePlatform?.isChecked = true; rbTelegram?.isChecked = false; rbWechat?.isChecked = false }
-                "TELEGRAM" -> { rbLine?.isChecked = false; rbPhonePlatform?.isChecked = false; rbTelegram?.isChecked = true; rbWechat?.isChecked = false }
-                "WECHAT" -> { rbLine?.isChecked = false; rbPhonePlatform?.isChecked = false; rbTelegram?.isChecked = false; rbWechat?.isChecked = true }
-            }
+    private fun speakBlessing() {
+        try {
+            DeityBlessingTTS.speakCurrentBlessing(applicationContext)
+        } catch (e: Exception) {
+            android.util.Log.e("UI3_TTS", "TTS 祝福語音播放異常: ${e.message}")
         }
     }
 
     private fun clearDraft() = getSharedPreferences("PublishDraft", MODE_PRIVATE).edit().clear().apply()
-
-    private fun showClearDraftDialog() {
-        AlertDialog.Builder(this).setTitle(getString(R.string.dialog_clear_draft_title)).setMessage(getString(R.string.dialog_clear_draft_msg)).setPositiveButton(getString(R.string.confirm)) { _, _ ->
-            clearDraft()
-            etDetail?.text?.clear(); etSocialLink?.text?.clear(); etPhoneNumber?.text?.clear(); etContactId?.text?.clear()
-            rbLine?.isChecked = true; rbPhonePlatform?.isChecked = false; rbTelegram?.isChecked = false; rbWechat?.isChecked = false
-            Toast.makeText(this, getString(R.string.msg_draft_cleared), Toast.LENGTH_SHORT).show()
-        }.setNegativeButton(getString(R.string.cancel), null).show()
-    }
 
     override fun onDestroy() { DeityBlessingTTS.shutdown(); super.onDestroy() }
 }

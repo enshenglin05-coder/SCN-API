@@ -36,7 +36,10 @@ class WebAppInterface(private val context: Context) {
 class AppWebViewClient(private val context: Context) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        val url = request?.url?.toString() ?: return false
+        var url = request?.url?.toString() ?: return false
+        if (url.startsWith("http://", ignoreCase = true)) {
+            url = "https://" + url.substring(7)
+        }
         if (handleTelUrl(view, url) || handleExternalAppUrl(view, url)) {
             return true // ⚠️ 必須回傳 true，告訴系統「原生已接管，停止 WebView 繼續加載與搜尋」
         }
@@ -151,8 +154,12 @@ class AppWebViewClient(private val context: Context) : WebViewClient() {
     private fun launchExternalIntent(view: WebView?, url: String): Boolean {
         try {
             view?.stopLoading() // 立即中斷 WebView 內網頁載入
+            var secureUrl = url.trim()
+            if (secureUrl.startsWith("http://", ignoreCase = true)) {
+                secureUrl = "https://" + secureUrl.substring(7)
+            }
             val ctx = view?.context ?: context
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(secureUrl)).apply {
                 if (ctx !is android.app.Activity) {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }

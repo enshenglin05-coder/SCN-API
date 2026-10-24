@@ -12,16 +12,10 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     override fun startActivity(intent: Intent?) {
-        if (intent != null && PhoneActionHelper.safeStartActivity(this, intent)) {
-            return
-        }
         super.startActivity(intent)
     }
 
     override fun startActivity(intent: Intent?, options: Bundle?) {
-        if (intent != null && PhoneActionHelper.safeStartActivity(this, intent)) {
-            return
-        }
         super.startActivity(intent, options)
     }
 }

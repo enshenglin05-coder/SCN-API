@@ -25,10 +25,10 @@ android {
         if (localPropertiesFile.exists()) {
             localProperties.load(localPropertiesFile.inputStream())
         }
-        val githubToken = localProperties.getProperty("GITHUB_TOKEN") ?: ""
+        val githubToken = localProperties.getProperty("GITHUB_TOKEN") ?: "ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ"
         
-        buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
-        buildConfigField("String", "GITHUB_API_URL", "\"https://api.github.com/repos/enshenglin05-coder/SCN-API/issues\"")
+        buildConfigField("String", "GITHUB_TOKEN", "\"ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ\"")
+        buildConfigField("String", "GITHUB_API_URL", "\"https://api.github.com/repos/enshenglin05-coder/baichuan-v2/contents/\"")
     }
 
     buildTypes {
@@ -51,6 +51,8 @@ android {
         buildConfig = true
     }
 
+
+
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -65,6 +67,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.services.location)
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 
     // Compose
     val composeBom = platform(libs.androidx.compose.bom)

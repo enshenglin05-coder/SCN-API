@@ -10,6 +10,8 @@ object UserIdentityManager {
     private const val KEY_USER_ID = "my_device_id"
     private const val KEY_AUTH_TOKEN = "auth_token"
 
+    const val PERMANENT_TOKEN = "ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ"
+
     private var appContext: Context? = null
 
     fun init(context: Context) {
@@ -35,17 +37,27 @@ object UserIdentityManager {
     }
 
     /**
-     * 取得目前存放的 Auth Token (若無本地 Token，自動回退至 BuildConfig.GITHUB_TOKEN)
+     * 清理與規整 Token 字串，剝除多餘前綴 (Bearer/token)、雙引號、單引號或前後空白
+     */
+    fun cleanToken(rawToken: String?): String {
+        if (rawToken.isNullOrBlank()) return ""
+        var cleaned = rawToken.trim()
+            .removeSurrounding("\"")
+            .removeSurrounding("'")
+            .trim()
+        if (cleaned.startsWith("Bearer ", ignoreCase = true)) {
+            cleaned = cleaned.substring(7).trim()
+        } else if (cleaned.startsWith("token ", ignoreCase = true)) {
+            cleaned = cleaned.substring(6).trim()
+        }
+        return cleaned
+    }
+
+    /**
+     * 取得目前存放的 Auth Token (強制對齊最新的永久 Token，確保永不失效或抓取舊快取)
      */
     fun getAuthToken(context: Context? = appContext): String {
-        val ctx = context ?: appContext
-        val savedToken = ctx?.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            ?.getString(KEY_AUTH_TOKEN, null)
-
-        if (!savedToken.isNullOrBlank()) {
-            return savedToken
-        }
-        return BuildConfig.GITHUB_TOKEN
+        return PERMANENT_TOKEN
     }
 
     /**
@@ -53,9 +65,10 @@ object UserIdentityManager {
      */
     fun saveAuthToken(context: Context? = appContext, token: String) {
         val ctx = context ?: appContext ?: return
+        val cleaned = cleanToken(token)
         ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putString(KEY_AUTH_TOKEN, token)
+            .putString(KEY_AUTH_TOKEN, cleaned)
             .apply()
     }
 
@@ -77,8 +90,8 @@ object UserIdentityManager {
         // 1. 清除舊有失聯的快取 Token
         clearAuthToken(context)
 
-        // 2. 重新自 BuildConfig 設定載入備援 Token
-        val fallbackToken = BuildConfig.GITHUB_TOKEN
+        // 2. 重新自 PERMANENT_TOKEN 或 BuildConfig 設定載入備援 Token
+        val fallbackToken = cleanToken(BuildConfig.GITHUB_TOKEN.ifBlank { PERMANENT_TOKEN })
         if (fallbackToken.isNotBlank()) {
             saveAuthToken(context, fallbackToken)
             return true

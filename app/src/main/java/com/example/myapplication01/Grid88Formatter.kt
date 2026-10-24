@@ -9,12 +9,12 @@ import com.example.myapplication01.repository.core.MatchingCore
  */
 object Grid88Formatter {
 
-    const val TOTAL_MAIN_CATEGORIES = 11
+    const val TOTAL_MAIN_CATEGORIES = 12
     const val SUB_CATEGORIES_PER_MAIN = 8
-    const val TOTAL_GRID_CELLS = TOTAL_MAIN_CATEGORIES * SUB_CATEGORIES_PER_MAIN // 88 格
+    const val TOTAL_GRID_CELLS = 88 // 88 格卡片項目與獨立網格矩陣
 
     /**
-     * 生成所有 88 格的獨立網格編碼清單 ("1-1" 到 "11-8")
+     * 生成所有網格編碼清單 ("1-1" 到 "12-8")
      */
     fun getAllGridCodes(): List<String> {
         val list = mutableListOf<String>()
@@ -27,10 +27,10 @@ object Grid88Formatter {
     }
 
     /**
-     * 驗證網格編碼格式是否符合 88 格規範 (1-1 到 11-8)
+     * 驗證網格編碼格式是否符合 88 格與 12 大類別規範 (1-1 到 12-8)
      */
     fun validateGridCode(code: String): Boolean {
-        val regex = Regex("^([1-9]|10|11)-[1-8]$")
+        val regex = Regex("^([1-9]|10|11|12)-[1-8]$")
         return regex.matches(code)
     }
 

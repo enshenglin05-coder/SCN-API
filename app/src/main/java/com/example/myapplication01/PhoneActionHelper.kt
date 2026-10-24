@@ -242,47 +242,54 @@ object PhoneActionHelper {
         }
     }
 
-    /**
-     * 開啟外部網址進入點：強制最上方死攔截所有包含 tel: 或搜尋格式 tel 的 URI，直接調用卡片標準 openDialer 邏輯！
-     */
-    fun openExternalUrl(context: Context, url: String) {
-        val trimmed = url.trim()
-        val dummyIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trimmed))
-        if (safeStartActivity(context, dummyIntent)) {
-            return
+    fun sanitizeUrl(url: String?): String {
+        if (url.isNullOrBlank()) return ""
+        var targetUrl = url.trim()
+        if (!targetUrl.startsWith("http://", ignoreCase = true) && !targetUrl.startsWith("https://", ignoreCase = true)) {
+            targetUrl = "https://$targetUrl"
         }
-
-        openUrl(context, trimmed)
+        if (targetUrl.startsWith("http://", ignoreCase = true)) {
+            targetUrl = targetUrl.replace("http://", "https://", ignoreCase = true)
+        }
+        return targetUrl
     }
 
     /**
-     * 全域開啟 URL 進入點：直接調用卡片標準 openDialer 邏輯！
+     * 開啟外部網址進入點：直接發射 Intent 喚起系統預設瀏覽器（Chrome/Edge/系統瀏覽器）
      */
-    fun openUrl(context: Context, url: String) {
-        val trimmed = url.trim()
-        val dummyIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trimmed))
+    fun openExternalUrl(context: Context, url: String) {
+        if (url.isBlank()) return
+        val targetUrl = sanitizeUrl(url)
+
+        val dummyIntent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
         if (safeStartActivity(context, dummyIntent)) {
             return
         }
-        // 原本開啟網頁的邏輯...
-        try {
-            val webView = android.webkit.WebView(context).apply {
-                attachToWebView(this)
-                loadUrl(trimmed)
-            }
 
-            androidx.appcompat.app.AlertDialog.Builder(context)
-                .setTitle("外部網頁預覽")
-                .setView(webView)
-                .setPositiveButton(context.getString(R.string.confirm), null)
-                .show()
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
         } catch (e: Exception) {
             try {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(trimmed)))
+                val encodedQuery = java.net.URLEncoder.encode(url, "UTF-8")
+                val searchUrl = "https://www.google.com/search?q=$encodedQuery"
+                val searchIntent = Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl)).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(searchIntent)
             } catch (_: Exception) {
                 Toast.makeText(context, context.getString(R.string.error_open_link), Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    /**
+     * 全域開啟 URL 進入點：相容導向外部瀏覽器
+     */
+    fun openUrl(context: Context, url: String) {
+        openExternalUrl(context, url)
     }
 
     /**

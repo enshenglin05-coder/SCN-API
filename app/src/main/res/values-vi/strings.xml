@@ -14,6 +14,7 @@
     <string name="cat_9_pet">9. Thú cưng</string>
     <string name="cat_10_service">10. Dịch vụ</string>
     <string name="cat_11_reserved">11. Nhóm dự trữ</string>
+    <string name="cat_12_religion">12. Tín ngưỡng &amp; Cầu nguyện</string>
 
     <!-- Sub-items Vietnamese -->
     <string name="sub_item_1_1">Ẩm thực Trung Hoa</string>
@@ -205,4 +206,26 @@
     <string name="btn_more">(Xem thêm)</string>
     <string name="btn_less">(Thu gọn)</string>
     <string name="platform_phone">Số điện thoại</string>
+
+    <string name="sub_item_11_1">Đồ thủ công\nTừ thiện</string>
+    <string name="sub_item_11_2">Quyên góp vật tư</string>
+    <string name="sub_item_11_3">Tuyển tình nguyện viên</string>
+    <string name="sub_item_11_4">Suất ăn từ thiện</string>
+    <string name="sub_item_11_5">Cứu hộ chó mèo</string>
+    <string name="sub_item_11_6">Chăm sóc người già</string>
+    <string name="sub_item_11_7">Cắt tóc &amp; Khám bệnh từ thiện</string>
+    <string name="sub_item_11_8">Bảo vệ môi trường</string>
+
+    <string name="sub_item_12_1">Thổ Địa Công\nPhúc Đức Chính Thần</string>
+    <string name="sub_item_12_2">Quan Thánh Đế Quân\nÂn Chủ Công</string>
+    <string name="sub_item_12_3">Thiên Thượng Thánh Mẫu\nThánh Mẫu Mẫu</string>
+    <string name="sub_item_12_4">Kitô Giáo\nCầu Nguyện</string>
+    <string name="sub_item_12_5">Phật Giáo\nThắp Đèn Cầu Phúc</string>
+    <string name="sub_item_12_6">Công Giáo\nCầu Nguyện</string>
+    <string name="sub_item_12_7">Bình An Tâm Hồn\nCầu Phúc</string>
+    <string name="sub_item_12_8">Tín Ngưỡng Tổng Hợp\nTu Tập</string>
+
+    <string name="lang_ko">Tiếng Hàn</string>
+    <string name="lang_vi">Tiếng Việt</string>
+    <string name="scroll_hint">Vuốt lên/xuống để khám phá thẻ</string>
 </resources>

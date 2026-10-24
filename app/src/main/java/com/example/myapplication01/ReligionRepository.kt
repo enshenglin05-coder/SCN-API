@@ -14,7 +14,8 @@ object ReligionRepository {
                 ReligionCard("ja_1", R.string.religion_ja_shinto_title, R.string.religion_ja_shinto_desc, ReligionCategory.SHINTO),
                 ReligionCard("ja_2", R.string.religion_ja_buddhist_title, R.string.religion_ja_buddhist_desc, ReligionCategory.BUDDHIST_AMBER),
                 ReligionCard("ja_3", R.string.religion_ja_christian_title, R.string.religion_ja_christian_desc, ReligionCategory.CHRISTIAN),
-                ReligionCard("ja_4", R.string.religion_ja_general_title, R.string.religion_ja_general_desc, ReligionCategory.GENERAL)
+                ReligionCard("ja_4", R.string.religion_ja_catholic_title, R.string.religion_ja_catholic_desc, ReligionCategory.CATHOLIC_BLUE),
+                ReligionCard("ja_5", R.string.religion_ja_general_title, R.string.religion_ja_general_desc, ReligionCategory.GENERAL)
             )
             "ko" -> listOf(
                 ReligionCard("ko_1", R.string.religion_ko_protestant_title, R.string.religion_ko_protestant_desc, ReligionCategory.CHRISTIAN),

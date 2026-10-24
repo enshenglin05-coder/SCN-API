@@ -13,16 +13,23 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
 
     private var tts: TextToSpeech? = TextToSpeech(context.applicationContext, this)
     private var isReady = false
+    private var pendingSpeech: Triple<String, Int, String>? = null
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.TAIWAN)
+            val langCode = GlobalState.selectedLanguageCode
+            val locale = getLocaleFromLangCode(langCode)
+            val result = tts?.setLanguage(locale)
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TtsManager", "語言不支援或缺少資料")
-                isReady = false
-            } else {
-                isReady = true
-                Log.d("TtsManager", "TTS 引擎初始化成功！")
+                Log.e("TtsManager", "語言 $locale 不支援，降級至 Locale.TAIWAN")
+                tts?.setLanguage(Locale.TAIWAN)
+            }
+            isReady = true
+            Log.d("TtsManager", "TTS 引擎初始化成功！")
+            
+            pendingSpeech?.let { (text, queueMode, utteranceId) ->
+                pendingSpeech = null
+                speak(text, queueMode, utteranceId)
             }
         } else {
             isReady = false
@@ -30,11 +37,22 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         }
     }
 
+    private fun getLocaleFromLangCode(langCode: String): Locale {
+        return when (langCode) {
+            "zh-TW" -> Locale.TRADITIONAL_CHINESE
+            "en" -> Locale.US
+            "ja" -> Locale.JAPAN
+            "ko" -> Locale.KOREA
+            "vi" -> Locale("vi", "VN")
+            else -> Locale.TRADITIONAL_CHINESE
+        }
+    }
+
     /**
      * 切換 TTS 發音語系
      */
     fun setLanguage(locale: Locale): Boolean {
-        if (!isReady || tts == null) {
+        if (tts == null) {
             Log.w("TtsManager", "TTS 尚未準備就緒，無法設定語系")
             return false
         }
@@ -57,7 +75,8 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
                 Log.e("TtsManager", "播報語音時發生異常: ${e.message}", e)
             }
         } else {
-            Log.w("TtsManager", "TTS 尚未準備就緒，無法播報: $text")
+            Log.w("TtsManager", "TTS 尚未準備就緒，已快取播報請求: $text")
+            pendingSpeech = Triple(text, queueMode, utteranceId)
         }
     }
 
@@ -77,6 +96,7 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
      */
     fun shutdown() {
         try {
+            pendingSpeech = null
             tts?.stop()
             tts?.shutdown()
         } catch (e: Exception) {
@@ -88,5 +108,5 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         }
     }
 
-    fun isReady(): Boolean = isReady
+    fun isReady(): Boolean = isReady && tts != null
 }

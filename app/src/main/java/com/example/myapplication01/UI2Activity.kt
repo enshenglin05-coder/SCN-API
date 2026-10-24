@@ -1,6 +1,5 @@
 package com.example.myapplication01
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
-import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -32,8 +30,6 @@ class UI2Activity : BaseActivity() {
     private lateinit var rvMainCategories: RecyclerView
     private lateinit var topBarUI2: View
     private lateinit var btnBack: ImageButton
-    private lateinit var tvDistanceSetting: TextView
-    private lateinit var switchBaichuanAI: SwitchMaterial
 
     private var currentDistance = 6 // 預設值改為 6 KM
     private var selectedCategoryId: String? = null
@@ -43,6 +39,11 @@ class UI2Activity : BaseActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
+        // 確保從 UIE/GlobalState 同步當前語系
+        val langCode = GlobalState.selectedLanguageCode
+        val appLocale = androidx.core.os.LocaleListCompat.forLanguageTags(langCode)
+        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(appLocale)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_ui2)
 
@@ -52,16 +53,12 @@ class UI2Activity : BaseActivity() {
         setupMainRecyclerView()
         
         setupRainbowEngine()
-        
-        updateDistanceText()
     }
 
     private fun initViews() {
         rvMainCategories = findViewById(R.id.rvMainCategories)
         topBarUI2 = findViewById(R.id.topBarUI2)
         btnBack = findViewById(R.id.btnBackUI2)
-        tvDistanceSetting = findViewById(R.id.tvDistanceSetting)
-        switchBaichuanAI = findViewById(R.id.switchBaichuanAI)
     }
 
     private fun handleWindowInsets() {
@@ -78,37 +75,6 @@ class UI2Activity : BaseActivity() {
         btnBack.setOnClickListener {
             finish()
         }
-
-        tvDistanceSetting.setOnClickListener {
-            showDistancePickerDialog()
-        }
-
-        switchBaichuanAI.setOnCheckedChangeListener { _, _ ->
-            // 無論切換結果如何，皆提示功能暫不提供
-            Toast.makeText(this, "此功能暫不提供服務", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun showDistancePickerDialog() {
-        val picker = NumberPicker(this).apply {
-            minValue = 1
-            maxValue = 50 // 最大上限設為 50 KM
-            value = currentDistance
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_distance_title))
-            .setView(picker)
-            .setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                currentDistance = picker.value
-                updateDistanceText()
-            }
-            .setNegativeButton(getString(R.string.cancel), null)
-            .show()
-    }
-
-    private fun updateDistanceText() {
-        tvDistanceSetting.text = "${getString(R.string.distance_setting_prefix)}$currentDistance ${getString(R.string.km_unit)}"
     }
 
     private fun setupRainbowEngine() {
@@ -138,7 +104,8 @@ class UI2Activity : BaseActivity() {
             getString(R.string.cat_8_secondhand),
             getString(R.string.cat_9_pet),
             getString(R.string.cat_10_service),
-            Section11CharityData.SECTION_TITLE
+            Section11CharityData.SECTION_TITLE,
+            getString(R.string.cat_12_religion)
         )
         
         rvMainCategories.layoutManager = LinearLayoutManager(this)
@@ -214,9 +181,11 @@ class UI2Activity : BaseActivity() {
                 val resName = "sub_item_${categoryIndex}_$subIdx"
                 val resId = context.resources.getIdentifier(resName, "string", context.packageName)
 
-                // 【銜接邏輯】優先檢查是否為第 11 大項 (公益關懷)
+                // 【銜接邏輯】優先檢查是否為第 11 大項 (公益關懷) 或第 12 大項 (信仰祈福)
                 val subDisplayName = if (categoryIndex == "11") {
                     Section11CharityData.ITEMS[subId] ?: "Item $subIdx"
+                } else if (categoryIndex == "12") {
+                    Section12ReligionData.ITEMS[subId] ?: CategoryRepository.getSubItems("12").getOrNull(i)?.displayName ?: "Item $subIdx"
                 } else if (resId != 0) {
                     val rawName = context.getString(resId)
                     // 同步字典邏輯：優先使用 CategoryMenuData 的格式

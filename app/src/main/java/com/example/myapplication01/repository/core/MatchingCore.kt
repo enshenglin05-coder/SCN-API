@@ -19,12 +19,12 @@ object MatchingCore {
     }
 
     /**
-     * 88 格矩陣驗證 (1-1 ~ 11-8)
+     * 88 格矩陣驗證 (1-1 ~ 12-8)
      * 嚴格遵循草圖直向排列規則：
-     * 11 個大類，每個大類下 8 個小項（1-1~1-8, 2-1~2-8... 11-1~11-8）
+     * 12 個大類，每個大類下 8 個小項（1-1~1-8, 2-1~2-8... 12-1~12-8）
      */
     fun validateCategoryCode(code: String): Boolean {
-        val pattern = Regex("^([1-9]|10|11)-[1-8]$")
+        val pattern = Regex("^([1-9]|10|11|12)-[1-8]$")
         return pattern.matches(code)
     }
 

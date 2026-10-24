@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName
  * 核心編號矩陣 (11x8) 與模組化邏輯
  */
 data class RequirementCard(
-    @SerializedName("card_id", alternate = ["cardId"]) val card_id: String = "",
+    @SerializedName(value = "cardId", alternate = ["card_id"]) val card_id: String = "",
     @SerializedName("publisher_device_id", alternate = ["publisherDeviceId"]) val publisher_device_id: String = "",
-    @SerializedName("created_at", alternate = ["createdAt"]) val created_at: Long = System.currentTimeMillis(),
+    @SerializedName(value = "timestamp", alternate = ["created_at", "createdAt"]) val created_at: Long = System.currentTimeMillis(),
     
     // 按讚機制 (1.0 擴展)
     @SerializedName("like_count") val like_count: Int = 0,
@@ -19,17 +19,19 @@ data class RequirementCard(
     @SerializedName("category_code", alternate = ["drawer_code", "drawerCode"]) val category_code: String = "1-1",
     @SerializedName("drawer_type", alternate = ["type"]) val drawer_type: String = "1A", // 1A: 需求, 1B: 供給
     
+    @SerializedName(value = "cardType", alternate = ["category_tag", "category_name", "categoryName"]) val category_tag: String = "",
     @SerializedName("description") val description: String = "",
-    @SerializedName("media_url") val media_url: String? = null,
+    @SerializedName(value = "personalIntroUrl", alternate = ["media_url"]) val media_url: String? = null,
     
     // 4 選 1 聯絡工具模組化支援
     @SerializedName("contact_method", alternate = ["contact_type", "contactType"]) val contact_method: ContactMethod = ContactMethod.LINE,
-    @SerializedName("contact_value", alternate = ["contact_id", "contactId"]) val contact_value: String = "",
-    @SerializedName("phone_number") val phone_number: String? = null,
+    @SerializedName(value = "lineId", alternate = ["contact_value", "contact_id", "contactId"]) val contact_value: String = "",
+    @SerializedName(value = "phone", alternate = ["phone_number", "phoneNumber", "mobile", "tel"]) val phone_number: String? = null,
     
     // 經緯度定位與距離計算核心
-    @SerializedName("gps_lat", alternate = ["lat"]) val gps_lat: Double = 0.0,
-    @SerializedName("gps_lng", alternate = ["lng"]) val gps_lng: Double = 0.0,
+    @SerializedName(value = "latitude", alternate = ["gps_lat", "lat"]) val gps_lat: Double = 0.0,
+    @SerializedName(value = "longitude", alternate = ["gps_lng", "lng"]) val gps_lng: Double = 0.0,
+    @SerializedName("mapUrl") val mapUrl: String = "https://www.google.com/maps/search/?api=1&query=$gps_lat,$gps_lng",
     
     @SerializedName("theme_color") val theme_color: String = "#FFFFFF",
     
@@ -39,8 +41,8 @@ data class RequirementCard(
     @SerializedName("reports_by_reason") val reports_by_reason: Map<String, Set<String>> = emptyMap(),
     @SerializedName("accepted_by_device_id") val accepted_by_device_id: String? = null,
     
-    // UI 渲染標籤 (由 app 端動態生成或從 repository 取得)
-    @SerializedName("category_tag", alternate = ["category_name", "categoryName"]) val category_tag: String = "",
+    @SerializedName(value = "reportCount", alternate = ["report_count"]) val reportCount: Int = reporter_ids.size,
+    @SerializedName(value = "errorCount", alternate = ["error_count"]) val errorCount: Int = 0,
     
     // TTL 與測試模式支援
     @SerializedName("ttl_hours") val ttl_hours: Int = 12,
@@ -48,20 +50,69 @@ data class RequirementCard(
     
     @Transient val isSelfOwner: Boolean = false
 ) {
+    val phone: String? get() = phone_number
+
     enum class ContactMethod {
         LINE, TELEGRAM, WECHAT, PHONE
     }
 
     /**
-     * 動態 TTL 效期檢查 (預設 12 小時)
+     * 獲取用於撥號的有效電話號碼 (針對真實卡片與預設卡片統一提煉)
      */
-    fun isExpired(): Boolean {
-        val ttlMillis = ttl_hours * 60 * 60 * 1000L
-        return System.currentTimeMillis() - created_at > ttlMillis
+    fun getPhoneForDialing(): String? {
+        // 1. 真實雲端 JSON 卡片：優先正確讀取 card.phone / phone_number
+        val realPhone = phone?.trim()?.takeIf { it.isNotBlank() && it != "null" }
+            ?: phone_number?.trim()?.takeIf { it.isNotBlank() && it != "null" }
+        if (!realPhone.isNullOrEmpty()) {
+            val cleaned = PhoneActionHelper.cleanPhoneNumber(realPhone)
+            return if (cleaned.isNotBlank()) cleaned else realPhone
+        }
+
+        // 2. 預設卡片 / 其它來源檢查 (若沒有實質電話資料，後續交由防呆機制顯示 Toast)
+        val cv = contact_value.trim()
+        if (cv.isNotEmpty() && cv != "null") {
+            if (contact_method == ContactMethod.PHONE) {
+                val cleaned = PhoneActionHelper.cleanPhoneNumber(cv)
+                if (cleaned.isNotBlank()) return cleaned
+            }
+            val extracted = PhoneActionHelper.extractPhoneNumber(cv)
+            if (!extracted.isNullOrBlank()) {
+                return extracted
+            }
+        }
+
+        // 3. 從說明 (description) 中提煉電話號碼
+        val extractedDesc = PhoneActionHelper.extractPhoneNumber(description)
+        if (!extractedDesc.isNullOrBlank()) {
+            return extractedDesc
+        }
+
+        return null
+    }
+
+    /**
+     * 動態 12 小時 TTL 效期檢查 (無論真實或虛擬卡片，暫存期限一律為 12 小時，超過即抹除)
+     */
+    fun isExpired(nowMillis: Long = System.currentTimeMillis()): Boolean {
+        val effectiveTtlHours = if (ttl_hours in 1..12) ttl_hours else 12
+        val ttlMillis = effectiveTtlHours * 60 * 60 * 1000L
+        return (nowMillis - created_at) > ttlMillis
     }
 
     /**
      * 是否為預留擴充池 (Category 11)
      */
     fun isReserved(): Boolean = category_code.startsWith("11-")
+
+    /**
+     * 判斷是否為預設/靜態測試卡片
+     * 用於隔開預設卡片與發送者真實卡片之 Google Map 經緯度導航與渲染邏輯
+     */
+    fun isPresetCard(): Boolean {
+        return is_test_only || 
+               publisher_device_id == "SEARCH_ENGINE_AUTO_NODE" || 
+               publisher_device_id == "SYSTEM_ADMIN" || 
+               card_id.startsWith("TEST_") || 
+               card_id.startsWith("SEARCH_AUTO_CARD_")
+    }
 }

@@ -2,17 +2,23 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true">
 
     <!-- 128 色流光邊框裝飾層 -->
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/cvBorderViewport"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
         android:fillViewport="true"
         android:clipChildren="false"
         android:clipToPadding="false"
@@ -95,7 +101,7 @@
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
                             app:backgroundTint="@null"
-                            android:text="🚀 AI 發布"
+                            android:text="🚀 啟動AI"
                             android:textColor="#FFFFFF"
                             android:textSize="13sp"
                             android:textStyle="bold"

@@ -81,7 +81,7 @@ class ExampleUnitTest {
             targetType = "1A",
             currentDeviceId = "USER_TEST_DEVICE",
             limitDistanceKm = 50.0
-        )
+        ).filter { it.card_id.startsWith("TEST_DRAWER_4_1_") }
         assertEquals(20, reqCardsFromRepo.size)
 
         val supCardsFromRepo = BaichuanRepository.getFilteredCards(
@@ -91,7 +91,7 @@ class ExampleUnitTest {
             targetType = "1B",
             currentDeviceId = "USER_TEST_DEVICE",
             limitDistanceKm = 50.0
-        )
+        ).filter { it.card_id.startsWith("TEST_DRAWER_4_1_") }
         assertEquals(20, supCardsFromRepo.size)
     }
 
@@ -120,7 +120,7 @@ class ExampleUnitTest {
             targetType = "1A",
             currentDeviceId = "USER_TEST_DEVICE",
             limitDistanceKm = 50.0
-        )
+        ).filter { it.card_id.startsWith("TEST_DRAWER_4_2_") }
         assertEquals(20, reqCardsFromRepo.size)
 
         val supCardsFromRepo = BaichuanRepository.getFilteredCards(
@@ -130,7 +130,7 @@ class ExampleUnitTest {
             targetType = "1B",
             currentDeviceId = "USER_TEST_DEVICE",
             limitDistanceKm = 50.0
-        )
+        ).filter { it.card_id.startsWith("TEST_DRAWER_4_2_") }
         assertEquals(20, supCardsFromRepo.size)
     }
 
@@ -412,13 +412,15 @@ class ExampleUnitTest {
     @Test
     fun testGrid88FormatterAndABCrossLogic() {
         val allGrids = Grid88Formatter.getAllGridCodes()
-        assertEquals(88, allGrids.size)
+        assertEquals(96, allGrids.size)
         assertEquals("1-1", allGrids.first())
-        assertEquals("11-8", allGrids.last())
+        assertEquals("12-8", allGrids.last())
 
         assertTrue(Grid88Formatter.validateGridCode("1-1"))
         assertTrue(Grid88Formatter.validateGridCode("11-8"))
-        assertFalse(Grid88Formatter.validateGridCode("12-1"))
+        assertTrue(Grid88Formatter.validateGridCode("12-1"))
+        assertTrue(Grid88Formatter.validateGridCode("12-8"))
+        assertFalse(Grid88Formatter.validateGridCode("13-1"))
         assertFalse(Grid88Formatter.validateGridCode("1-9"))
 
         val verticalOrder = Grid88Formatter.getTwoColumnVerticalOrder(1)
@@ -437,11 +439,136 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun testSearchEngineReasoningAndAutoPublish88Cards() {
+        // 1. 測試防禦機制 (Token 驗證)
+        assertFalse(SearchEngineReasoningEngine.verifyExecutionGuard("INVALID_MANUAL_TOKEN"))
+        assertTrue(SearchEngineReasoningEngine.verifyExecutionGuard(SearchEngineReasoningEngine.SYSTEM_AUTO_EXECUTION_TOKEN))
+
+        // 2. 人工無效 Token 啟動應被阻斷
+        val blockedCards = SearchEngineReasoningEngine.generateAndPublish88Cards("UNAUTHORIZED_TOKEN")
+        assertTrue(blockedCards.isEmpty())
+
+        // 3. 正確排程 Token 生成卡片項目
+        val autoCards = SearchEngineReasoningEngine.generateAndPublish88Cards(SearchEngineReasoningEngine.SYSTEM_AUTO_EXECUTION_TOKEN)
+        assertTrue(autoCards.isNotEmpty())
+
+        // 4. 驗證四種通訊軟體 (LINE, Telegram, WeChat, Phone) 交叉輪流使用
+        val methodCounts = autoCards.groupingBy { it.contact_method }.eachCount()
+        assertTrue((methodCounts[RequirementCard.ContactMethod.LINE] ?: 0) > 0)
+        assertTrue((methodCounts[RequirementCard.ContactMethod.TELEGRAM] ?: 0) > 0)
+        assertTrue((methodCounts[RequirementCard.ContactMethod.WECHAT] ?: 0) > 0)
+        assertTrue((methodCounts[RequirementCard.ContactMethod.PHONE] ?: 0) > 0)
+
+        // 5. 驗證情境推理內容說明
+        val firstCard = autoCards.first()
+        assertEquals(12, firstCard.ttl_hours)
+
+        // 6. 驗證寫入 BaichuanRepository 分片倉儲
+        val retrievedCards = BaichuanRepository.getFilteredCards(
+            25.0026, 121.4977, listOf(firstCard.category_code), firstCard.drawer_type, "TEST_DEVICE", 50.0
+        )
+        assertTrue(retrievedCards.isNotEmpty())
+    }
+
+    @Test
+    fun testReligionCategory12PresetCards() {
+        BaichuanRepository.seedTestDrawerData()
+        
+        // 驗證第 12 大類 (12-1 至 12-8) 每個子項目皆有 10 筆需求與 10 筆供給
+        for (sub in 1..8) {
+            val code = "12-$sub"
+            val reqCards = BaichuanRepository.getFilteredCards(
+                25.0026, 121.4977, listOf(code), "1A", "TEST_DEVICE", 50.0
+            )
+            val supCards = BaichuanRepository.getFilteredCards(
+                25.0026, 121.4977, listOf(code), "1B", "TEST_DEVICE", 50.0
+            )
+            assertEquals("Code $code 應有 10 筆需求卡片", 10, reqCards.size)
+            assertEquals("Code $code 應有 10 筆供給卡片", 10, supCards.size)
+        }
+    }
+
+    @Test
+    fun testGitSyncSchedulerAnd12HourLoop() {
+        BaichuanRepository.clearAll()
+        
+        // 執行單次同步與抹除循環
+        GitSyncScheduler.triggerSyncCycle()
+
+        // 驗證 12 小時清空後自動觸發重新生成 88 個卡片
+        val allGrids = Grid88Formatter.getAllGridCodes()
+        val cardsFromRepo = BaichuanRepository.getFilteredCards(
+            25.0026, 121.4977, allGrids, "1A", "SYSTEM_ADMIN", 50.0
+        )
+        assertFalse(cardsFromRepo.isEmpty())
+        
+        // 模擬 12 小時效期過去
+        val futureMillis = System.currentTimeMillis() + (13 * 3600 * 1000L)
+        BaichuanRepository.purgeExpiredCards(futureMillis)
+
+        // 抹除後觸發下一次同步，將會自動重新載入新一批卡片
+        GitSyncScheduler.triggerSyncCycle()
+        val newBatch = BaichuanRepository.getFilteredCards(
+            25.0026, 121.4977, allGrids, "1A", "SYSTEM_ADMIN", 50.0
+        )
+        assertFalse(newBatch.isEmpty())
+    }
+
+    @Test
+    fun testPresetVsRealPublisherCardLocationLogic() {
+        // 1. 預設卡片 (靜態卡片) 測試
+        val presetCard = RequirementCard(
+            card_id = "SEARCH_AUTO_CARD_001",
+            publisher_device_id = "SEARCH_ENGINE_AUTO_NODE",
+            is_test_only = true,
+            gps_lat = 25.0026,
+            gps_lng = 121.4977
+        )
+        assertTrue(presetCard.isPresetCard())
+
+        // 2. 發送者卡片 (真實卡片) 測試
+        val realPublisherCard = RequirementCard(
+            card_id = "REAL_USER_CARD_888",
+            publisher_device_id = "USER_DEVICE_UUID_12345",
+            is_test_only = false,
+            gps_lat = 25.0330,
+            gps_lng = 121.5654
+        )
+        assertFalse(realPublisherCard.isPresetCard())
+        assertEquals(25.0330, realPublisherCard.gps_lat, 0.0001)
+        assertEquals(121.5654, realPublisherCard.gps_lng, 0.0001)
+    }
+
+    @Test
+    fun testBaichuanV2CardsPathAnd88Grids() {
+        val testCardId = "CARD_12345"
+        val expectedPath = "https://api.github.com/repos/enshenglin05-coder/baichuan-v2/contents/cards/$testCardId.json"
+        assertTrue(expectedPath.contains("/contents/cards/$testCardId.json"))
+
+        val allGrids = Grid88Formatter.getAllGridCodes()
+        assertEquals(96, allGrids.size)
+        allGrids.forEach { code ->
+            assertTrue(Grid88Formatter.validateGridCode(code))
+        }
+    }
+
+    @Test
     fun testGitHubApiUploadSimulationAndTokenIntegrity() {
-        // 1. 驗證 Token 未被截斷或遺失，確保完整性
+        // 1. 驗證 Token 未被截斷或遺失，確保完整性 (嚴格對齊 Bearer 授權格式)
         val authHeader = BaichuanApiService.getAuthHeader()
-        assertTrue(authHeader.contains("ghp_6MlbFMVQUcYGsI6BMkxkxvPpbm2EFp2gEJgq"))
-        assertTrue(authHeader.startsWith("token ") || authHeader.startsWith("Bearer "))
+        assertTrue(authHeader.contains("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ"))
+        assertTrue(authHeader.startsWith("Bearer "))
+        assertEquals("Authorization: Bearer ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", "Authorization: $authHeader")
+
+        // 驗證 Token 清理函數 cleanToken 能夠正確剝除 Bearer/token 前綴與引號
+        assertEquals("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", UserIdentityManager.cleanToken("Bearer ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ"))
+        assertEquals("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", UserIdentityManager.cleanToken("token ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ"))
+        assertEquals("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", UserIdentityManager.cleanToken("\"ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ\""))
+        assertEquals("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", UserIdentityManager.cleanToken("  ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ\n"))
+
+        // 驗證 401 自動 Refresh 時能正確重載永久 Token
+        assertTrue(UserIdentityManager.refreshAuthToken(null))
+        assertEquals("ghp_Y3Rb2ZHTrMcVDujrkjzv6SjhYicGU3107XgZ", UserIdentityManager.getAuthToken(null))
 
         // 2. 模擬 GitHub Contents API 請求建構與 Payload 格式驗證
         val testCard = RequirementCard(
@@ -471,13 +598,63 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun testScnApiDataRoutingPathFor88Grids() {
-        val allGrids = Grid88Formatter.getAllGridCodes()
-        assertEquals(88, allGrids.size)
-        allGrids.forEach { code ->
-            val expectedPath = "https://api.github.com/repos/enshenglin05-coder/SCN-API/contents/data/$code.json"
-            assertTrue(expectedPath.contains("/contents/data/$code.json"))
-            assertTrue(Grid88Formatter.validateGridCode(code))
-        }
+    fun testCard12HourPurgeAndJsonExceptionRules() {
+        // 1. 測試 12 小時自動暫存與抹除機制
+        val now = System.currentTimeMillis()
+        val validCard = RequirementCard(
+            card_id = "VALID_CARD_01",
+            created_at = now - (11 * 3600 * 1000L), // 11 小時前 (未過期)
+            category_code = "1-1",
+            drawer_type = "1A",
+            gps_lat = 25.0026,
+            gps_lng = 121.4977
+        )
+        val expiredCard = RequirementCard(
+            card_id = "EXPIRED_CARD_01",
+            created_at = now - (13 * 3600 * 1000L), // 13 小時前 (已過期)
+            category_code = "1-1",
+            drawer_type = "1A"
+        )
+
+        assertFalse(validCard.isExpired(now))
+        assertTrue(expiredCard.isExpired(now))
+
+        BaichuanRepository.clearAll()
+        BaichuanRepository.injectTestCards(listOf(validCard, expiredCard))
+
+        // 觸發 12 小時暫存抹除
+        BaichuanRepository.purgeExpiredCards(now)
+
+        val filteredCards = BaichuanRepository.getFilteredCards(
+            25.0026, 121.4977, listOf("1-1"), "1A", "TEST_DEV", 50.0
+        )
+        assertEquals(1, filteredCards.size)
+        assertEquals("VALID_CARD_01", filteredCards.first().card_id)
+
+        // 2. 測試 JSON 異常處理與丟棄機制
+        CardJsonExceptionHandler.clearAll()
+        val brokenJson = "{ invalid_json_syntax: true "
+
+        // 第 1 次異常：直接丟棄，不立案
+        val res1 = CardJsonExceptionHandler.parseAndHandle(brokenJson, "BROKEN_TEST_KEY")
+        assertTrue(res1.isEmpty())
+        assertEquals(0, CardJsonExceptionHandler.getQuarantinedRecords().size)
+
+        // 第 2 次異常：直接丟棄，不立案
+        val res2 = CardJsonExceptionHandler.parseAndHandle(brokenJson, "BROKEN_TEST_KEY")
+        assertTrue(res2.isEmpty())
+        assertEquals(0, CardJsonExceptionHandler.getQuarantinedRecords().size)
+
+        // 第 3 次異常 (達到 3 次門檻)：進入人工審核隔離區，支援凍結與忽略
+        val res3 = CardJsonExceptionHandler.parseAndHandle(brokenJson, "BROKEN_TEST_KEY")
+        assertTrue(res3.isEmpty())
+        val quarantined = CardJsonExceptionHandler.getQuarantinedRecords()
+        assertEquals(1, quarantined.size)
+        assertEquals("BROKEN_TEST_KEY", quarantined.first().recordId)
+        assertEquals(QuarantinedCardRecord.ReviewStatus.MANUAL_REVIEW, quarantined.first().status)
+
+        // 測試審核狀態切換 (例如切換為凍結 FROZEN)
+        CardJsonExceptionHandler.updateRecordStatus("BROKEN_TEST_KEY", QuarantinedCardRecord.ReviewStatus.FROZEN)
+        assertEquals(QuarantinedCardRecord.ReviewStatus.FROZEN, CardJsonExceptionHandler.getQuarantinedRecords().first().status)
     }
 }
